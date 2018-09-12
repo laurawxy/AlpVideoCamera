@@ -11,7 +11,6 @@ target 'AlpVideoCamera' do
   pod 'RTRootNavigationController'
   pod 'SDWebImage'
   pod 'MBProgressHUD'
-  pod 'MJRefresh'
   pod 'TZImagePickerController'
 
 end
