@@ -1655,7 +1655,7 @@ typedef NS_ENUM(NSUInteger , choseType)
         cell.iconImgView.image = [UIImage imageWithContentsOfFile:data.iconPath];
         cell.nameLabel.text = data.name;
         
-        cell.CheckMarkImgView.hidden = !data.isSelected;
+        cell.checkMarkImgView.hidden = !data.isSelected;
         return cell;
     }else if (collectionView == _stickersCollectionView)
     {
@@ -1665,7 +1665,7 @@ typedef NS_ENUM(NSUInteger , choseType)
         cell.iconImgView.image = [UIImage imageWithContentsOfFile:data.StickersImgPaht];
         cell.nameLabel.text = data.name;
         
-        cell.CheckMarkImgView.hidden = !data.isSelected;
+        cell.checkMarkImgView.hidden = !data.isSelected;
         return cell;
     }else{
         static NSString *cellID2 = @"MyCollectionCell2";
@@ -1674,7 +1674,7 @@ typedef NS_ENUM(NSUInteger , choseType)
         UIImage* image = [UIImage imageWithContentsOfFile:data.iconPath];
         cell.iconImgView.image = image;
         cell.nameLabel.text = data.name;
-        cell.CheckMarkImgView.hidden = !data.isSelected;
+        cell.checkMarkImgView.hidden = !data.isSelected;
         return cell;
     }
 }

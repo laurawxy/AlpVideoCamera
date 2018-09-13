@@ -21,6 +21,15 @@
     return self;
 }
 
+- (instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super initWithCoder:coder];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
+
 - (void)setup {
     
     [self.contentView addSubview:self.iconImgView];
@@ -38,16 +47,20 @@
     [NSLayoutConstraint constraintWithItem:self.nameLabel attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.iconImgView attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0.0].active = YES;
     [NSLayoutConstraint constraintWithItem:self.nameLabel attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.iconImgView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0].active = YES;
     
-    [self.contentView addSubview:self.CheckMarkImgView];
-    self.CheckMarkImgView.hidden = YES;
-    [NSLayoutConstraint constraintWithItem:self.CheckMarkImgView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0.0].active = YES;
-    [NSLayoutConstraint constraintWithItem:self.CheckMarkImgView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0].active = YES;
-    [NSLayoutConstraint constraintWithItem:self.CheckMarkImgView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0].active = YES;
-    [NSLayoutConstraint constraintWithItem:self.CheckMarkImgView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0.0].active = YES;
-    [NSLayoutConstraint constraintWithItem:self.CheckMarkImgView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:83.0].active = YES;
-    [NSLayoutConstraint constraintWithItem:self.CheckMarkImgView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:115.0].active = YES;
+    [self.contentView addSubview:self.checkMarkImgView];
+    self.checkMarkImgView.hidden = YES;
+    [NSLayoutConstraint constraintWithItem:self.checkMarkImgView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0.0].active = YES;
+    [NSLayoutConstraint constraintWithItem:self.checkMarkImgView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0].active = YES;
+    [NSLayoutConstraint constraintWithItem:self.checkMarkImgView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0].active = YES;
+    [NSLayoutConstraint constraintWithItem:self.checkMarkImgView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.contentView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0.0].active = YES;
+    [NSLayoutConstraint constraintWithItem:self.checkMarkImgView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:83.0].active = YES;
+    [NSLayoutConstraint constraintWithItem:self.checkMarkImgView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:115.0].active = YES;
     
 }
+
+////////////////////////////////////////////////////////////////////////
+#pragma mark - getter
+////////////////////////////////////////////////////////////////////////
 
 - (UIImageView *)iconImgView {
     if (!_iconImgView) {
@@ -69,14 +82,14 @@
     return _nameLabel;
 }
 
-- (UIImageView *)CheckMarkImgView {
-    if (!_CheckMarkImgView) {
-        _CheckMarkImgView = [[UIImageView alloc] init];
-        _CheckMarkImgView.image = [UIImage imageNamed:@"GiftCheckmarkIcon@2x"];
-        _CheckMarkImgView.translatesAutoresizingMaskIntoConstraints = NO;
-        _CheckMarkImgView.contentMode = UIViewContentModeScaleToFill;
+- (UIImageView *)checkMarkImgView {
+    if (!_checkMarkImgView) {
+        _checkMarkImgView = [[UIImageView alloc] init];
+        _checkMarkImgView.image = [UIImage imageNamed:@"GiftCheckmarkIcon"];
+        _checkMarkImgView.translatesAutoresizingMaskIntoConstraints = NO;
+        _checkMarkImgView.contentMode = UIViewContentModeScaleToFill;
     }
-    return _CheckMarkImgView;
+    return _checkMarkImgView;
 }
 
 @end
