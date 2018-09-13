@@ -1,17 +1,18 @@
 //
-//  EditingPublishingDynamicViewController.m
-//  iShow
+//  AlpEditingPublishingViewController.m
+//  AlpVideoCamera
 //
-//  Created by 胡阳阳 on 17/3/18.
-//
+//  Created by xiaoyuan on 2018/9/13.
+//  Copyright © 2018 xiaoyuan. All rights reserved.
 //
 
-#import "EditingPublishingDynamicViewController.h"
+#import "AlpEditingPublishingViewController.h"
 #import "MBProgressHUD.h"
- #import <CoreLocation/CoreLocation.h>
+#import <CoreLocation/CoreLocation.h>
 #import "masonry.h"
 #import <AVFoundation/AVFoundation.h>
 #import "RTRootNavigationController.h"
+
 #define SCREEN_LayoutScaleBaseOnIPHEN6(x) (([UIScreen mainScreen].bounds.size.width)/375.00 * x)
 #define kSignatureContextLengths 20
 
@@ -23,7 +24,7 @@
 
 #define RGB16(rgbValue) [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0]
 
-@interface EditingPublishingDynamicViewController ()<UITextViewDelegate,CLLocationManagerDelegate>
+@interface AlpEditingPublishingViewController () <UITextViewDelegate, CLLocationManagerDelegate>
 {
     MBProgressHUD* HUD;
     BOOL isExceed_cai;
@@ -37,15 +38,16 @@
 
 @property (strong, nonatomic) CLLocationManager* locationManager;
 @property (strong, nonatomic) NSString* cityName;
+
 @end
 
-@implementation EditingPublishingDynamicViewController
+@implementation AlpEditingPublishingViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-  
-  self.navigationController.navigationBarHidden = YES;
-//    _videoCoverImg = [[AppDelegate appDelegate].cmImageSize getImage:[[_videoURL absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
+    
+    self.navigationController.navigationBarHidden = YES;
+    //    _videoCoverImg = [[AppDelegate appDelegate].cmImageSize getImage:[[_videoURL absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
     _videoCoverImg = [self getImage:[[_videoURL absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
     UIImageView* bgImgView = [[UIImageView alloc] initWithImage:_videoCoverImg];
     [self.view addSubview:bgImgView];
@@ -83,9 +85,6 @@
         make.centerX.centerY.equalTo(headerBar);
     }];
     
-    //    UIButton* backBtn = [[UIButton alloc] init];
-    //    backBtn setImage:<#(nullable UIImage *)#> forState:<#(UIControlState)#>
-    
     UIButton* nextBtn = [[UIButton alloc] init];
     [nextBtn setTitle:@"保存至本地" forState:UIControlStateNormal];
     [nextBtn.titleLabel setFont:[UIFont systemFontOfSize:15]];
@@ -107,9 +106,9 @@
     }];
     
     UIImageView* changeImageView = [[UIImageView alloc] init];
-//    changeImageView.image = [[AppDelegate appDelegate].cmImageSize getImage:[[_videoURL absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
+    //    changeImageView.image = [[AppDelegate appDelegate].cmImageSize getImage:[[_videoURL absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
     changeImageView.image = [self getImage:[[_videoURL absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
-//    [[AppDelegate appDelegate].cmImageSize getImage:[[_videoURL absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]]
+    //    [[AppDelegate appDelegate].cmImageSize getImage:[[_videoURL absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]]
     changeImageView.contentMode = UIViewContentModeScaleAspectFill;
     changeImageView.clipsToBounds = YES;
     [superView addSubview:changeImageView];
@@ -118,22 +117,22 @@
         make.width.height.equalTo(@(SCREEN_LayoutScaleBaseOnIPHEN6(150)));
         make.top.equalTo(superView).offset(SCREEN_LayoutScaleBaseOnIPHEN6( 85.5));
     }];
-//    [[AppDelegate appDelegate].cmImageSize setImagesRounded:changeImageView cornerRadiusValue:3 borderWidthValue:0 borderColorWidthValue:[UIColor clearColor] ];
+    //    [[AppDelegate appDelegate].cmImageSize setImagesRounded:changeImageView cornerRadiusValue:3 borderWidthValue:0 borderColorWidthValue:[UIColor clearColor] ];
     changeImageView.layer.masksToBounds = YES;
     changeImageView.layer.cornerRadius = 3;
-  
+    
     UIButton* changeVideoCovBtn = [UIButton new];
     changeVideoCovBtn.titleLabel.font = [UIFont systemFontOfSize:SCREEN_LayoutScaleBaseOnIPHEN6(13.0)];
     changeVideoCovBtn.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:.5];
-//    [changeVideoCovBtn setTitle:@"更换封面" forState:UIControlStateNormal];
+    //    [changeVideoCovBtn setTitle:@"更换封面" forState:UIControlStateNormal];
     [changeVideoCovBtn setTitle:@"视频封面" forState:UIControlStateNormal];
     [changeImageView addSubview:changeVideoCovBtn];
     [changeVideoCovBtn mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.bottom.equalTo(changeImageView);
         make.height.equalTo(@(SCREEN_LayoutScaleBaseOnIPHEN6(30)));
     }];
-//    [[AppDelegate appDelegate].cmImageSize setButtonsRounded:changeVideoCovBtn cornerRadiusValue:SCREEN_LayoutScaleBaseOnIPHEN6(3) borderWidthValue:0 borderColorWidthValue:RGB16(COLOR_FONT_WHITE)];
-
+    //    [[AppDelegate appDelegate].cmImageSize setButtonsRounded:changeVideoCovBtn cornerRadiusValue:SCREEN_LayoutScaleBaseOnIPHEN6(3) borderWidthValue:0 borderColorWidthValue:RGB16(COLOR_FONT_WHITE)];
+    
     changeVideoCovBtn.layer.masksToBounds = YES;
     changeVideoCovBtn.layer.cornerRadius = SCREEN_LayoutScaleBaseOnIPHEN6(3);
     
@@ -170,10 +169,10 @@
         make.bottom.equalTo(bottomBarView).offset(-SCREEN_LayoutScaleBaseOnIPHEN6(38.0));
         make.height.equalTo(@(SCREEN_LayoutScaleBaseOnIPHEN6(45.0)));
     }];
-//    [[AppDelegate appDelegate].cmImageSize setButtonsRounded:backBtn cornerRadiusValue:SCREEN_LayoutScaleBaseOnIPHEN6(45.0)/2.0 borderWidthValue:0 borderColorWidthValue:RGB16(COLOR_FONT_WHITE)];
+    //    [[AppDelegate appDelegate].cmImageSize setButtonsRounded:backBtn cornerRadiusValue:SCREEN_LayoutScaleBaseOnIPHEN6(45.0)/2.0 borderWidthValue:0 borderColorWidthValue:RGB16(COLOR_FONT_WHITE)];
     backBtn.layer.masksToBounds = YES;
     backBtn.layer.cornerRadius = SCREEN_LayoutScaleBaseOnIPHEN6(45.0)/2.0;
-  
+    
     UILabel* leftWXLabel = [UILabel new];
     leftWXLabel.font = [UIFont systemFontOfSize:SCREEN_LayoutScaleBaseOnIPHEN6(12.0)];
     leftWXLabel.textColor = RGB16(COLOR_FONT_LIGHTGRAY);
@@ -244,9 +243,9 @@
         make.height.equalTo(@(0.7));
         make.centerY.equalTo(shareTipLabel);
     }];
-
     
-
+    
+    
     _contentTextField = [[UITextView alloc ] init];
     _contentTextField.returnKeyType = UIReturnKeyDone;
     _contentTextField.text = @"点击添加描述(最多20个字)";
@@ -260,7 +259,7 @@
         make.left.equalTo(bottomBarView).offset(SCREEN_LayoutScaleBaseOnIPHEN6(20));
         make.right.equalTo(bottomBarView).offset(-SCREEN_LayoutScaleBaseOnIPHEN6(20));
     }];
-//    [[AppDelegate appDelegate].cmImageSize setTextViewsRounded:_contentTextField cornerRadiusValue:4 borderWidthValue:0 borderColorWidthValue:[UIColor clearColor]];
+    //    [[AppDelegate appDelegate].cmImageSize setTextViewsRounded:_contentTextField cornerRadiusValue:4 borderWidthValue:0 borderColorWidthValue:[UIColor clearColor]];
     _contentTextField.layer.masksToBounds = YES;
     _contentTextField.layer.cornerRadius = 4;
     
@@ -272,7 +271,7 @@
     [_limitLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.bottom.equalTo(_contentTextField.mas_bottom).offset(-SCREEN_LayoutScaleBaseOnIPHEN6(5));
         make.right.equalTo(_contentTextField.mas_right).offset(-SCREEN_LayoutScaleBaseOnIPHEN6(5));
-//        make.center.equalTo(_contentTextField);
+        //        make.center.equalTo(_contentTextField);
     }];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
@@ -286,66 +285,66 @@
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-//    _cityName = [AppDelegate appDelegate].appDelegatePlatformUserStructure.userCity;
-////    1.实例化定位管理器
-//    _locationManager = [[CLLocationManager alloc] init];
-////    2.设置代理
-//    _locationManager.delegate = self;
-//    //3.定位精度
-//    [_locationManager setDesiredAccuracy:kCLLocationAccuracyBest];
-//    //4.请求用户权限：分为：4.1只在前台开启定位4.2在后台也可定位，
-//    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8) {
-//        [_locationManager requestWhenInUseAuthorization];//4.1只在前台开启定位
-////        [_locationManager requestAlwaysAuthorization];//4.2在后台也可定位
-//    }
-////    5.0更新用户位置
-//    [_locationManager startUpdatingLocation];
+    //    _cityName = [AppDelegate appDelegate].appDelegatePlatformUserStructure.userCity;
+    ////    1.实例化定位管理器
+    //    _locationManager = [[CLLocationManager alloc] init];
+    ////    2.设置代理
+    //    _locationManager.delegate = self;
+    //    //3.定位精度
+    //    [_locationManager setDesiredAccuracy:kCLLocationAccuracyBest];
+    //    //4.请求用户权限：分为：4.1只在前台开启定位4.2在后台也可定位，
+    //    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8) {
+    //        [_locationManager requestWhenInUseAuthorization];//4.1只在前台开启定位
+    ////        [_locationManager requestAlwaysAuthorization];//4.2在后台也可定位
+    //    }
+    ////    5.0更新用户位置
+    //    [_locationManager startUpdatingLocation];
 }
 //#pragma mark - CLLocationManagerDelegate -
 //-(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations  {
 //    CLLocation *newLocation = locations[0];
-//    
+//
 //    CLLocationCoordinate2D oldCoordinate = newLocation.coordinate;
-//    
+//
 //    NSLog(@"旧的经度：%f,旧的纬度：%f",oldCoordinate.longitude,oldCoordinate.latitude);
-//    
-//    
-//    
+//
+//
+//
 //    [manager stopUpdatingLocation];
-//    
-//    
-//    
+//
+//
+//
 //    CLGeocoder *geocoder = [[CLGeocoder alloc]init];
-//    
+//
 //    [geocoder reverseGeocodeLocation:newLocation completionHandler:^(NSArray<CLPlacemark *> * _Nullable placemarks, NSError * _Nullable error) {
-//        
-//        
-//        
+//
+//
+//
 //        for (CLPlacemark *place in placemarks) {
-//            
+//
 //            NSLog(@"name,%@",place.name);                       // 位置名
-//            
+//
 //            NSLog(@"thoroughfare,%@",place.thoroughfare);       // 街道
-//            
+//
 //            NSLog(@"subThoroughfare,%@",place.subThoroughfare); // 子街道
-//            
+//
 //            NSLog(@"locality,%@",place.locality);               // 市
 //            _cityName = place.locality;
 //            if ([_cityName hasSuffix:@"市"]) {
 //                _cityName = [_cityName stringByReplacingOccurrencesOfString:@"市" withString:@""];
 //                NSLog(@"NewCity:%@",_cityName);
 //            }
-//            
-//            
+//
+//
 //            NSLog(@"subLocality,%@",place.subLocality);         // 区
-//            
+//
 //            NSLog(@"country,%@",place.country);                 // 国家
-//            
-//            
+//
+//
 //        }
-//        
+//
 //    }];
-//    
+//
 //}
 
 
@@ -357,37 +356,37 @@
 - (void) keyboardWillShow:(NSNotification *)notification {
     
     
-//    if (SCREEN_MODE_IPHONE5) {
-//        //获取键盘高度，在不同设备上，以及中英文下是不同的
-//        CGFloat kbHeight = [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height;
-//        
-//        //计算出键盘顶端到inputTextView panel底端的距离(加上自定义的缓冲距离INTERVAL_KEYBOARD)
-//        //    CGFloat offset = (panelInputTextView.frame.origin.y+panelInputTextView.frame.size.height+INTERVAL_KEYBOARD) - (self.frame.size.height - kbHeight);
-//        CGFloat offset =  kbHeight - (ScreenHeight - _fourShareBgView.frame.origin.y);
-//        
-//        // 取得键盘的动画时间，这样可以在视图上移的时候更连贯
-//        double duration = [[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue];
-//        
-//        //将视图上移计算好的偏移
-//        if(offset > 0) {
-//            [UIView animateWithDuration:duration animations:^{
-//                self.frame = CGRectMake(0.0f, -offset, self.frame.size.width, self.frame.size.height);
-//            }];
-//        }
-//        
-//    }
+    //    if (SCREEN_MODE_IPHONE5) {
+    //        //获取键盘高度，在不同设备上，以及中英文下是不同的
+    //        CGFloat kbHeight = [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height;
+    //
+    //        //计算出键盘顶端到inputTextView panel底端的距离(加上自定义的缓冲距离INTERVAL_KEYBOARD)
+    //        //    CGFloat offset = (panelInputTextView.frame.origin.y+panelInputTextView.frame.size.height+INTERVAL_KEYBOARD) - (self.frame.size.height - kbHeight);
+    //        CGFloat offset =  kbHeight - (ScreenHeight - _fourShareBgView.frame.origin.y);
+    //
+    //        // 取得键盘的动画时间，这样可以在视图上移的时候更连贯
+    //        double duration = [[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue];
+    //
+    //        //将视图上移计算好的偏移
+    //        if(offset > 0) {
+    //            [UIView animateWithDuration:duration animations:^{
+    //                self.frame = CGRectMake(0.0f, -offset, self.frame.size.width, self.frame.size.height);
+    //            }];
+    //        }
+    //
+    //    }
     
 }
 
 ///键盘消失事件
 - (void) keyboardWillHide:(NSNotification *)notify {
-//    // 键盘动画时间
-//    double duration = [[notify.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue];
-//    
-//    //视图下沉恢复原状
-//    [UIView animateWithDuration:duration animations:^{
-//        self.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
-//    }];
+    //    // 键盘动画时间
+    //    double duration = [[notify.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue];
+    //
+    //    //视图下沉恢复原状
+    //    [UIView animateWithDuration:duration animations:^{
+    //        self.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
+    //    }];
 }
 
 
@@ -454,13 +453,13 @@
         [self.rt_navigationController dismissViewControllerAnimated:YES completion:nil];
     });
     
-//
+    //
     
-//    if ([_contentTextField.text length] > kSignatureContextLengths) {
-//        return;
-//    }
-//    HUD = [MBProgressHUD showHUDAddedTo:self.view animated:YES ];
-//    HUD.labelText = @"上传中";
+    //    if ([_contentTextField.text length] > kSignatureContextLengths) {
+    //        return;
+    //    }
+    //    HUD = [MBProgressHUD showHUDAddedTo:self.view animated:YES ];
+    //    HUD.labelText = @"上传中";
 }
 
 -(void)backToEditVideoCor
@@ -481,11 +480,11 @@
 
 /**
  点击微信朋友圈分享按钮
-
+ 
  @param sender 微信朋友圈Btn
  */
 - (void)clickWXFriendSShareBtn:(UIButton *)sender {
-
+    
     if (!sender.selected) {
         sender.selected = YES;
         _rightWXBtn.selected = NO;
@@ -497,7 +496,7 @@
 
 /**
  点击微信分享按钮
-
+ 
  @param sender 微信Btn
  */
 - (void)clickWeChatShareBtn:(UIButton *)sender {
@@ -514,7 +513,7 @@
 {
     [[UIApplication sharedApplication] setStatusBarHidden:NO];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-//    [[NSNotificationCenter defaultCenter] postNotificationName:kTabBarHiddenNONotification object:self];
+    //    [[NSNotificationCenter defaultCenter] postNotificationName:kTabBarHiddenNONotification object:self];
     [self.navigationController popToRootViewControllerAnimated:NO];
 }
 
@@ -523,38 +522,39 @@
     // Dispose of any resources that can be recreated.
 }
 - (BOOL)prefersStatusBarHidden {
-  return YES;
+    return YES;
 }
 
 #pragma mark 通过视频的URL，获得视频缩略图
 -(UIImage *)getImage:(NSString *)videoURL
 
 {
-  
-  AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:[NSURL fileURLWithPath:videoURL] options:nil];
-  
-  AVAssetImageGenerator *gen = [[AVAssetImageGenerator alloc] initWithAsset:asset];
-  
-  gen.appliesPreferredTrackTransform = YES;
-  
-  CMTime time = CMTimeMakeWithSeconds(0.0, 600);
-  
-  NSError *error = nil;
-  
-  CMTime actualTime;
-  
-  CGImageRef image = [gen copyCGImageAtTime:time actualTime:&actualTime error:&error];
-  
-  UIImage *thumb = [[UIImage alloc] initWithCGImage:image];
-  
-  CGImageRelease(image);
-  
-  return thumb;
+    
+    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:[NSURL fileURLWithPath:videoURL] options:nil];
+    
+    AVAssetImageGenerator *gen = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+    
+    gen.appliesPreferredTrackTransform = YES;
+    
+    CMTime time = CMTimeMakeWithSeconds(0.0, 600);
+    
+    NSError *error = nil;
+    
+    CMTime actualTime;
+    
+    CGImageRef image = [gen copyCGImageAtTime:time actualTime:&actualTime error:&error];
+    
+    UIImage *thumb = [[UIImage alloc] initWithCGImage:image];
+    
+    CGImageRelease(image);
+    
+    return thumb;
 }
 
 -(void)dealloc
 {
     NSLog(@"%@释放了",self.class);
 }
+
 
 @end

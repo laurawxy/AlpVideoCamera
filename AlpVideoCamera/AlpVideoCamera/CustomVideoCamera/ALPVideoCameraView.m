@@ -11,13 +11,13 @@
 #import "LFGPUImageEmptyFilter.h"
 #import <AVFoundation/AVFoundation.h>
 #import <AssetsLibrary/AssetsLibrary.h>
-#import "EditVideoViewController.h"
+#import "AlpEditVideoViewController.h"
 #import "MBProgressHUD.h"
 #import "UIView+Tools.h"
 #import "SDAVAssetExportSession.h"
 #import "TZImagePickerController.h"
 #import "TZImageManager.h"
-#import "EditingPublishingDynamicViewController.h"
+#import "AlpEditingPublishingViewController.h"
 #import <Photos/Photos.h>
 #import <Photos/PHImageManager.h>
 #define VIDEO_FOLDER @"videoFolder"
@@ -382,7 +382,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
                         [HUD hide:YES afterDelay:1.5];
                     }else
                     {
-                        EditingPublishingDynamicViewController* cor = [[EditingPublishingDynamicViewController alloc] init];
+                        AlpEditingPublishingViewController* cor = [[AlpEditingPublishingViewController alloc] init];
                         cor.videoURL = url;
                         
                         [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -409,7 +409,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
                     [HUD hide:YES afterDelay:1.5];
                 }else
                 {
-                    EditingPublishingDynamicViewController* cor = [[EditingPublishingDynamicViewController alloc] init];
+                    AlpEditingPublishingViewController* cor = [[AlpEditingPublishingViewController alloc] init];
                     cor.videoURL = url;
                     
                     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -535,7 +535,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
             
             [videoCamera stopCameraCapture];
             
-            EditVideoViewController* vc = [[EditVideoViewController alloc]init];
+            AlpEditVideoViewController* vc = [[AlpEditVideoViewController alloc]init];
             vc.width = weakSelf.width;
             vc.hight = weakSelf.hight;
             vc.bit = weakSelf.bit;

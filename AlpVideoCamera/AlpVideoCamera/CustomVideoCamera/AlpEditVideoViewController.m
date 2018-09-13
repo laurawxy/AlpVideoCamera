@@ -1,22 +1,23 @@
- //
-//  EditVideoViewController.m
-//  iShow
 //
-//  Created by 胡阳阳 on 17/3/8.
+//  AlpEditVideoViewController.m
+//  AlpVideoCamera
 //
+//  Created by xiaoyuan on 2018/9/13.
+//  Copyright © 2018 xiaoyuan. All rights reserved.
 //
 
-#import "EditVideoViewController.h"
+#import "AlpEditVideoViewController.h"
 #import <AVFoundation/AVFoundation.h>
 #import "Masonry.h"
 #import "UIView+Tools.h"
-#import "MusicItemCollectionViewCell.h"
+#import "AlpMusicItemCollectionViewCell.h"
 #import "MBProgressHUD.h"
 #import "SDAVAssetExportSession.h"
 #import "GPUImage.h"
 #import "LFGPUImageEmptyFilter.h"
-#import "EditingPublishingDynamicViewController.h"
+#import "AlpEditingPublishingViewController.h"
 #import "RTRootNavigationController.h"
+
 #define SCREEN_WIDTH [UIScreen mainScreen].bounds.size.width
 #define SCREEN_HEIGHT [UIScreen mainScreen].bounds.size.height
 #define SCREEN_LayoutScaleBaseOnIPHEN6(x) (([UIScreen mainScreen].bounds.size.width)/375.00 * x)
@@ -65,7 +66,7 @@ typedef NS_ENUM(NSUInteger , choseType)
     choseStickers = 3,//
 };
 
-@interface EditVideoViewController ()<UITextFieldDelegate,UICollectionViewDelegate,UICollectionViewDataSource>
+@interface AlpEditVideoViewController () <UITextFieldDelegate, UICollectionViewDelegate, UICollectionViewDataSource>
 @property (nonatomic, strong) AVPlayer *audioPlayer;
 @property (nonatomic, strong) NSMutableArray* musicAry;
 @property (nonatomic, strong) NSMutableArray* filterAry;
@@ -110,10 +111,9 @@ typedef NS_ENUM(NSUInteger , choseType)
 
 @property (nonatomic ,strong) UIImageView* stickersImgView;
 
-
 @end
 
-@implementation EditVideoViewController
+@implementation AlpEditVideoViewController
 {
     GPUImageMovie *movieFile;
     GPUImageMovie* endMovieFile;
@@ -123,7 +123,7 @@ typedef NS_ENUM(NSUInteger , choseType)
     UIImageView* playImg;
     MBProgressHUD*HUD;
     
-
+    
     
     AVPlayer *mainPlayer;
     AVPlayerLayer *playerLayer;
@@ -132,11 +132,6 @@ typedef NS_ENUM(NSUInteger , choseType)
     
 }
 @synthesize videoURL;
-
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -179,7 +174,7 @@ typedef NS_ENUM(NSUInteger , choseType)
     [filter addTarget:_filterView];
     
     _bgImageView = [[UIImageView alloc] init];
-//    _bgImageView.image = [[AppDelegate appDelegate].cmImageSize getImage:[[videoURL absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
+    //    _bgImageView.image = [[AppDelegate appDelegate].cmImageSize getImage:[[videoURL absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
     [self.view addSubview:_bgImageView];
     [_bgImageView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.bottom.left.right.equalTo(self.view);
@@ -212,7 +207,7 @@ typedef NS_ENUM(NSUInteger , choseType)
     [_stickersImgView setMultipleTouchEnabled:YES];
     UIPanGestureRecognizer *panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panView:)];
     [_stickersImgView addGestureRecognizer:panGestureRecognizer];
-
+    
     
     UIView* headerBar = [[UIView alloc] init];
     [self.view addSubview:headerBar];
@@ -231,8 +226,8 @@ typedef NS_ENUM(NSUInteger , choseType)
         make.centerX.centerY.equalTo(headerBar);
     }];
     
-//    UIButton* backBtn = [[UIButton alloc] init];
-//    backBtn setImage:<#(nullable UIImage *)#> forState:<#(UIControlState)#>
+    //    UIButton* backBtn = [[UIButton alloc] init];
+    //    backBtn setImage:<#(nullable UIImage *)#> forState:<#(UIControlState)#>
     
     UIButton* nextBtn = [[UIButton alloc] init];
     [nextBtn setTitle:@"下一步" forState:UIControlStateNormal];
@@ -340,7 +335,7 @@ typedef NS_ENUM(NSUInteger , choseType)
     [_editTheOriginaBtn setTitleColor:[UIColor colorWithRed:250/256.0 green:211/256.0 blue:75/256.0 alpha:1] forState:UIControlStateSelected];
     [_editTheOriginaBtn setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
     _editTheOriginaBtn.backgroundColor = [UIColor clearColor];
-//    [_editTheOriginaBtn addTarget:self action:@selector(clickEditOriginalBtn) forControlEvents:UIControlEventTouchUpInside];
+    //    [_editTheOriginaBtn addTarget:self action:@selector(clickEditOriginalBtn) forControlEvents:UIControlEventTouchUpInside];
     [_musicBottomBar addSubview:_editTheOriginaBtn];
     [_editTheOriginaBtn mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(_musicBottomBar);
@@ -368,8 +363,8 @@ typedef NS_ENUM(NSUInteger , choseType)
     layout.estimatedItemSize = CGSizeMake(83, 115);
     
     //设置分区的头视图和尾视图是否始终固定在屏幕上边和下边
-//    layout.sectionFootersPinToVisibleBounds = YES;
-//    layout.sectionHeadersPinToVisibleBounds = YES;
+    //    layout.sectionFootersPinToVisibleBounds = YES;
+    //    layout.sectionHeadersPinToVisibleBounds = YES;
     
     // 设置水平滚动方向
     //水平滚动
@@ -398,7 +393,7 @@ typedef NS_ENUM(NSUInteger , choseType)
     _collectionView.delegate = self;
     
     // 注册cell
-    [_collectionView registerClass:[MusicItemCollectionViewCell class] forCellWithReuseIdentifier:@"MyCollectionCell"];
+    [_collectionView registerClass:[AlpMusicItemCollectionViewCell class] forCellWithReuseIdentifier:@"MyCollectionCell"];
     
     /* 设置UICollectionView的属性 */
     //设置滚动条
@@ -421,8 +416,8 @@ typedef NS_ENUM(NSUInteger , choseType)
     layout2.estimatedItemSize = CGSizeMake(83, 115);
     
     //设置分区的头视图和尾视图是否始终固定在屏幕上边和下边
-//    layout2.sectionFootersPinToVisibleBounds = YES;
-//    layout2.sectionHeadersPinToVisibleBounds = YES;
+    //    layout2.sectionFootersPinToVisibleBounds = YES;
+    //    layout2.sectionHeadersPinToVisibleBounds = YES;
     
     // 设置水平滚动方向
     //水平滚动
@@ -451,7 +446,7 @@ typedef NS_ENUM(NSUInteger , choseType)
     _musicCollectionView.delegate = self;
     
     // 注册cell
-    [_musicCollectionView registerClass:[MusicItemCollectionViewCell class] forCellWithReuseIdentifier:@"MyCollectionCell2"];
+    [_musicCollectionView registerClass:[AlpMusicItemCollectionViewCell class] forCellWithReuseIdentifier:@"MyCollectionCell2"];
     
     /* 设置UICollectionView的属性 */
     //设置滚动条
@@ -503,7 +498,7 @@ typedef NS_ENUM(NSUInteger , choseType)
     _stickersCollectionView.delegate = self;
     
     // 注册cell
-    [_stickersCollectionView registerClass:[MusicItemCollectionViewCell class] forCellWithReuseIdentifier:@"MyCollectionCell3"];
+    [_stickersCollectionView registerClass:[AlpMusicItemCollectionViewCell class] forCellWithReuseIdentifier:@"MyCollectionCell3"];
     
     /* 设置UICollectionView的属性 */
     //设置滚动条
@@ -520,7 +515,7 @@ typedef NS_ENUM(NSUInteger , choseType)
     
     
     
-
+    
     HUD = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     HUD.hidden = YES;
     
@@ -596,21 +591,21 @@ typedef NS_ENUM(NSUInteger , choseType)
                      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                          HUD.hidden = YES;
                          [[NSNotificationCenter defaultCenter] removeObserver:self];
-                         EditingPublishingDynamicViewController* cor = [[EditingPublishingDynamicViewController alloc] init];
+                         AlpEditingPublishingViewController* cor = [[AlpEditingPublishingViewController alloc] init];
                          cor.videoURL = compressionEncoder.outputURL;
-//                         [[AppDelegate appDelegate] pushViewController:cor animated:YES];
+                         //                         [[AppDelegate appDelegate] pushViewController:cor animated:YES];
                          [self.rt_navigationController pushViewController:cor animated:YES complete:nil];
-                       
+                         
                      });
                      
                  }
                  else if (compressionEncoder.status == AVAssetExportSessionStatusCancelled)
                  {
-//                     HUD.labelText = @"Compression Failed";
+                     //                     HUD.labelText = @"Compression Failed";
                      HUD.label.text = @"Compression Failed";
                      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                          [[NSNotificationCenter defaultCenter] removeObserver:self];
-//                         [[NSNotificationCenter defaultCenter] postNotificationName:kTabBarHiddenNONotification object:self];
+                         //                         [[NSNotificationCenter defaultCenter] postNotificationName:kTabBarHiddenNONotification object:self];
                          [self.navigationController popToRootViewControllerAnimated:YES];
                          
                      });
@@ -620,7 +615,7 @@ typedef NS_ENUM(NSUInteger , choseType)
                      HUD.label.text = @"ompression Failed";
                      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                          [[NSNotificationCenter defaultCenter] removeObserver:self];
-//                         [[NSNotificationCenter defaultCenter] postNotificationName:kTabBarHiddenNONotification object:self];
+                         //                         [[NSNotificationCenter defaultCenter] postNotificationName:kTabBarHiddenNONotification object:self];
                          [self.navigationController popToRootViewControllerAnimated:YES];
                      });
                  }
@@ -648,7 +643,7 @@ typedef NS_ENUM(NSUInteger , choseType)
         {
             HUD.label.text = @"视频处理中...";
             [self compressVideoWithInputVideoUrl:videoURL];
-        
+            
         }
     }else
     {
@@ -676,7 +671,7 @@ typedef NS_ENUM(NSUInteger , choseType)
     }else{
         endFilter = [[NSClassFromString(_filtClassName) alloc] init];
     }
-
+    
     
     
     [endMovieFile addTarget:endFilter];
@@ -686,7 +681,7 @@ typedef NS_ENUM(NSUInteger , choseType)
     unlink([pathToMovie UTF8String]); // If a file already exists, AVAssetWriter won't let you record new frames, so delete the old movie
     NSURL *movieURL = [NSURL fileURLWithPath:pathToMovie];
     
-     movieWriter = [[GPUImageMovieWriter alloc] initWithMovieURL:movieURL size:CGSizeMake(720.0, 1280.0)];
+    movieWriter = [[GPUImageMovieWriter alloc] initWithMovieURL:movieURL size:CGSizeMake(720.0, 1280.0)];
     [endFilter  addTarget:movieWriter];
     movieWriter.shouldPassthroughAudio = YES;
     endMovieFile.audioEncodingTarget = movieWriter;
@@ -694,277 +689,277 @@ typedef NS_ENUM(NSUInteger , choseType)
     [movieWriter startRecording];
     [endMovieFile startProcessing];
     __weak GPUImageMovieWriter *weakmovieWriter = movieWriter;
-//    __weak MBProgressHUD *weakHUD = HUD;
+    //    __weak MBProgressHUD *weakHUD = HUD;
     typeof(self) __weak weakself = self;
     [movieWriter setCompletionBlock:^{
         [endFilter removeTarget:weakmovieWriter];
         [weakmovieWriter finishRecording];
-      if (weakself.audioPath||!weakself.stickersImgView.hidden) {
-        [weakself mixAudioAndVidoWithInputURL:movieURL];
-        //音乐混合
-      }else
-      {
-        //压缩
-        [weakself compressVideoWithInputVideoUrl:movieURL];
-      }
-
-
+        if (weakself.audioPath||!weakself.stickersImgView.hidden) {
+            [weakself mixAudioAndVidoWithInputURL:movieURL];
+            //音乐混合
+        }else
+        {
+            //压缩
+            [weakself compressVideoWithInputVideoUrl:movieURL];
+        }
+        
+        
         
     }];
 }
 
 -(void)mixAudioAndVidoWithInputURL:(NSURL*)inputURL;
 {
-
+    
     if (_audioPath) {
         [self mixAudioAndVidoWithInputURL2:inputURL];
     }else
     {
         [self mixAudioAndVidoWithInputURL1:inputURL];
     }
-//    //    audio529
-//    
-//    // 路径
-//    HUD.labelText = @"音乐合成中...";
-//    NSString *documents = [NSHomeDirectory() stringByAppendingPathComponent:@"tmp"];
-//    
-//    // 声音来源
-//    
-//    //    NSURL *audioInputUrl = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"audio529" ofType:@"mp3"]];
-//    
-//    NSURL *audioInputUrl = [NSURL fileURLWithPath:_audioPath];
-//    
-//    // 视频来源
-//    
-//    NSURL *videoInputUrl = inputURL;
-//    
-//    // 最终合成输出路径
-//    
-////    NSString *outPutFilePath = [documents stringByAppendingPathComponent:@"videoandoudio.mov"];
-//    
-//    // 添加合成路径
-//    
-//    
-//    
-//    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-//    formatter.dateFormat = @"yyyyMMddHHmmss";
-//    NSString *nowTimeStr = [formatter stringFromDate:[NSDate dateWithTimeIntervalSinceNow:0]];
-//    NSString *fileName = [[documents stringByAppendingPathComponent:nowTimeStr] stringByAppendingString:@"merge.mp4"];
-//    
-//    
-//    
-//    //    NSURL *outputFileUrl = [NSURL fileURLWithPath:outPutFilePath];
-//    NSURL *outputFileUrl = [NSURL fileURLWithPath:fileName];
-//    
-//    // 时间起点
-//    
-//    CMTime nextClistartTime = kCMTimeZero;
-//    
-//    // 创建可变的音视频组合
-//    
-//    AVMutableComposition *comosition = [AVMutableComposition composition];
-//    
-//    // 视频采集
-//    NSDictionary* options = @{AVURLAssetPreferPreciseDurationAndTimingKey:@YES};
-//    AVURLAsset *videoAsset = [[AVURLAsset alloc] initWithURL:videoInputUrl options:options];
-//    
-//    // 视频时间范围
-//    
-//    CMTimeRange videoTimeRange = CMTimeRangeMake(kCMTimeZero, videoAsset.duration);
-//    
-//    // 视频通道 枚举 kCMPersistentTrackID_Invalid = 0
-//    
-//    AVMutableCompositionTrack *videoTrack = [comosition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
-//    
-//    // 视频采集通道
-//    
-//    AVAssetTrack *videoAssetTrack = [[videoAsset tracksWithMediaType:AVMediaTypeVideo] firstObject];
-//    
-//    //  把采集轨道数据加入到可变轨道之中
-//    
-//    [videoTrack insertTimeRange:videoTimeRange ofTrack:videoAssetTrack atTime:nextClistartTime error:nil];
-//    
-//    // 声音采集
-//    
-//    AVURLAsset *audioAsset = [[AVURLAsset alloc] initWithURL:audioInputUrl options:options];
-//    
-//    // 因为视频短这里就直接用视频长度了,如果自动化需要自己写判断
-//    
-//    CMTimeRange audioTimeRange = videoTimeRange;
-//    
-//    // 音频通道
-//    
-//    AVMutableCompositionTrack *audioTrack = [comosition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
-//    
-//    // 音频采集通道
-//    
-//    AVAssetTrack *audioAssetTrack = [[audioAsset tracksWithMediaType:AVMediaTypeAudio] firstObject];
-//    
-//    // 加入合成轨道之中
-//    
-//    [audioTrack insertTimeRange:audioTimeRange ofTrack:audioAssetTrack atTime:nextClistartTime error:nil];
-//    
-//
-//    
-///*
-//    //调整视频音量
-//    AVMutableAudioMix *mutableAudioMix = [AVMutableAudioMix audioMix];
-//    // Create the audio mix input parameters object.
-//    AVMutableAudioMixInputParameters *mixParameters = [AVMutableAudioMixInputParameters audioMixInputParametersWithTrack:audioTrack];
-//    // Set the volume ramp to slowly fade the audio out over the duration of the composition.
-////    [mixParameters setVolumeRampFromStartVolume:1.f toEndVolume:0.f timeRange:CMTimeRangeMake(kCMTimeZero, mutableComposition.duration)];
-//    [mixParameters setVolume:.05f atTime:kCMTimeZero];
-//    // Attach the input parameters to the audio mix.
-//    mutableAudioMix.inputParameters = @[mixParameters];
-// */
-// 
-//    
-//    // 原音频轨道
-////    AVMutableCompositionTrack *audioTrack2 = [comosition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
-////     AVAssetTrack *audioAssetTrack2 = [[videoAsset tracksWithMediaType:AVMediaTypeAudio] firstObject];
-////    [audioTrack2 insertTimeRange:audioTimeRange ofTrack:audioAssetTrack2 atTime:nextClistartTime error:nil];
-//    
-//    
-//    if (!_editTheOriginaBtn.selected) {
-//        AVMutableAudioMix *mutableAudioMix = [AVMutableAudioMix audioMix];
-//        // Create the audio mix input parameters object.
-//        AVMutableAudioMixInputParameters *mixParameters = [AVMutableAudioMixInputParameters audioMixInputParametersWithTrack:audioTrack];
-//        // Set the volume ramp to slowly fade the audio out over the duration of the composition.
-//        //    [mixParameters setVolumeRampFromStartVolume:1.f toEndVolume:0.f timeRange:CMTimeRangeMake(kCMTimeZero, mutableComposition.duration)];
-//        [mixParameters setVolume:.5f atTime:kCMTimeZero];
-//        // Attach the input parameters to the audio mix.
-//        mutableAudioMix.inputParameters = @[mixParameters];
-//        
-//        AVMutableCompositionTrack *audioTrack2 = [comosition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
-//         AVAssetTrack *audioAssetTrack2 = [[videoAsset tracksWithMediaType:AVMediaTypeAudio] firstObject];
-//        [audioTrack2 insertTimeRange:audioTimeRange ofTrack:audioAssetTrack2 atTime:nextClistartTime error:nil];
-//        
-//
-//        //视频贴图
-//        CGSize videoSize = [videoTrack naturalSize];
-//        CALayer* aLayer = [CALayer layer];
-//        UIImage* waterImg = _stickersImgView.image;
-//        aLayer.contents = (id)waterImg.CGImage;
-//        
-//        float bili = 720/ScreenWidth;
-//        
-//        
-//        aLayer.frame = CGRectMake(_stickersImgView.frame.origin.x * bili,1280 - _stickersImgView.frame.origin.y *bili - 150*bili, 150*bili, 150*bili);
-//        aLayer.opacity = 1;
-//        
-//        CALayer *parentLayer = [CALayer layer];
-//        CALayer *videoLayer = [CALayer layer];
-//        parentLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
-//        videoLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
-//        [parentLayer addSublayer:videoLayer];
-//        [parentLayer addSublayer:aLayer];
-//        AVMutableVideoComposition* videoComp = [AVMutableVideoComposition videoComposition];
-//        videoComp.renderSize = videoSize;
-//        
-//        
-//        videoComp.frameDuration = CMTimeMake(1, 30);
-//        videoComp.animationTool = [AVVideoCompositionCoreAnimationTool videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer inLayer:parentLayer];
-//        AVMutableVideoCompositionInstruction* instruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
-//        
-//        instruction.timeRange = CMTimeRangeMake(kCMTimeZero, [comosition duration]);
-//        AVAssetTrack* mixVideoTrack = [[comosition tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
-//        AVMutableVideoCompositionLayerInstruction* layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:mixVideoTrack];
-//        instruction.layerInstructions = [NSArray arrayWithObject:layerInstruction];
-//        videoComp.instructions = [NSArray arrayWithObject: instruction];
-//        
-//        AVAssetExportSession *assetExport = [[AVAssetExportSession alloc] initWithAsset:comosition presetName:AVAssetExportPreset1280x720];
-//        
-//        assetExport.audioMix = mutableAudioMix;
-//        
-//        assetExport.videoComposition = videoComp;
-//        // 输出类型
-//        
-//        assetExport.outputFileType = AVFileTypeMPEG4;
-//        
-//        // 输出地址
-//        
-//        assetExport.outputURL = outputFileUrl;
-//        
-//        // 优化
-//        
-//        assetExport.shouldOptimizeForNetworkUse = YES;
-//        
-//        // 合成完毕
-//        
-//        [assetExport exportAsynchronouslyWithCompletionHandler:^{
-//            
-//            // 回到主线程
-//            
-//            dispatch_async(dispatch_get_main_queue(), ^{
-//                
-//                [self compressVideoWithInputVideoUrl:outputFileUrl];
-//                
-//            });
-//        }];
-//    }else
-//    {
-//        
-//        //视频贴图
-//        CGSize videoSize = [videoTrack naturalSize];
-//        CALayer* aLayer = [CALayer layer];
-//        UIImage* waterImg = _stickersImgView.image;
-//        aLayer.contents = (id)waterImg.CGImage;
-//        float bili = 720/ScreenWidth;
-//        aLayer.frame = CGRectMake(_stickersImgView.frame.origin.x * bili,1280 - _stickersImgView.frame.origin.y *bili - 150*bili, 150*bili, 150*bili);
-//        aLayer.opacity = 1;
-//        
-//        CALayer *parentLayer = [CALayer layer];
-//        CALayer *videoLayer = [CALayer layer];
-//        parentLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
-//        videoLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
-//        [parentLayer addSublayer:videoLayer];
-//        [parentLayer addSublayer:aLayer];
-//        AVMutableVideoComposition* videoComp = [AVMutableVideoComposition videoComposition];
-//        videoComp.renderSize = videoSize;
-//        
-//        
-//        videoComp.frameDuration = CMTimeMake(1, 30);
-//        videoComp.animationTool = [AVVideoCompositionCoreAnimationTool videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer inLayer:parentLayer];
-//        AVMutableVideoCompositionInstruction* instruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
-//        
-//        instruction.timeRange = CMTimeRangeMake(kCMTimeZero, [comosition duration]);
-//        AVAssetTrack* mixVideoTrack = [[comosition tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
-//        AVMutableVideoCompositionLayerInstruction* layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:mixVideoTrack];
-//        instruction.layerInstructions = [NSArray arrayWithObject:layerInstruction];
-//        videoComp.instructions = [NSArray arrayWithObject: instruction];
-//        
-//        // 创建一个输出
-//        
-//        AVAssetExportSession *assetExport = [[AVAssetExportSession alloc] initWithAsset:comosition presetName:AVAssetExportPreset1280x720];
-//        
-//        assetExport.videoComposition = videoComp;
-//        //    assetExport.audioMix = mutableAudioMix;
-//        // 输出类型
-//        
-//        assetExport.outputFileType = AVFileTypeMPEG4;
-//        
-//        // 输出地址
-//        
-//        assetExport.outputURL = outputFileUrl;
-//        
-//        // 优化
-//        
-//        assetExport.shouldOptimizeForNetworkUse = YES;
-//        
-//        // 合成完毕
-//        
-//        [assetExport exportAsynchronouslyWithCompletionHandler:^{
-//            
-//            // 回到主线程
-//            
-//            dispatch_async(dispatch_get_main_queue(), ^{
-//                
-//                [self compressVideoWithInputVideoUrl:outputFileUrl];
-//                
-//            });
-//        }];
-//
-//    }
+    //    //    audio529
+    //
+    //    // 路径
+    //    HUD.labelText = @"音乐合成中...";
+    //    NSString *documents = [NSHomeDirectory() stringByAppendingPathComponent:@"tmp"];
+    //
+    //    // 声音来源
+    //
+    //    //    NSURL *audioInputUrl = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"audio529" ofType:@"mp3"]];
+    //
+    //    NSURL *audioInputUrl = [NSURL fileURLWithPath:_audioPath];
+    //
+    //    // 视频来源
+    //
+    //    NSURL *videoInputUrl = inputURL;
+    //
+    //    // 最终合成输出路径
+    //
+    ////    NSString *outPutFilePath = [documents stringByAppendingPathComponent:@"videoandoudio.mov"];
+    //
+    //    // 添加合成路径
+    //
+    //
+    //
+    //    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    //    formatter.dateFormat = @"yyyyMMddHHmmss";
+    //    NSString *nowTimeStr = [formatter stringFromDate:[NSDate dateWithTimeIntervalSinceNow:0]];
+    //    NSString *fileName = [[documents stringByAppendingPathComponent:nowTimeStr] stringByAppendingString:@"merge.mp4"];
+    //
+    //
+    //
+    //    //    NSURL *outputFileUrl = [NSURL fileURLWithPath:outPutFilePath];
+    //    NSURL *outputFileUrl = [NSURL fileURLWithPath:fileName];
+    //
+    //    // 时间起点
+    //
+    //    CMTime nextClistartTime = kCMTimeZero;
+    //
+    //    // 创建可变的音视频组合
+    //
+    //    AVMutableComposition *comosition = [AVMutableComposition composition];
+    //
+    //    // 视频采集
+    //    NSDictionary* options = @{AVURLAssetPreferPreciseDurationAndTimingKey:@YES};
+    //    AVURLAsset *videoAsset = [[AVURLAsset alloc] initWithURL:videoInputUrl options:options];
+    //
+    //    // 视频时间范围
+    //
+    //    CMTimeRange videoTimeRange = CMTimeRangeMake(kCMTimeZero, videoAsset.duration);
+    //
+    //    // 视频通道 枚举 kCMPersistentTrackID_Invalid = 0
+    //
+    //    AVMutableCompositionTrack *videoTrack = [comosition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+    //
+    //    // 视频采集通道
+    //
+    //    AVAssetTrack *videoAssetTrack = [[videoAsset tracksWithMediaType:AVMediaTypeVideo] firstObject];
+    //
+    //    //  把采集轨道数据加入到可变轨道之中
+    //
+    //    [videoTrack insertTimeRange:videoTimeRange ofTrack:videoAssetTrack atTime:nextClistartTime error:nil];
+    //
+    //    // 声音采集
+    //
+    //    AVURLAsset *audioAsset = [[AVURLAsset alloc] initWithURL:audioInputUrl options:options];
+    //
+    //    // 因为视频短这里就直接用视频长度了,如果自动化需要自己写判断
+    //
+    //    CMTimeRange audioTimeRange = videoTimeRange;
+    //
+    //    // 音频通道
+    //
+    //    AVMutableCompositionTrack *audioTrack = [comosition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
+    //
+    //    // 音频采集通道
+    //
+    //    AVAssetTrack *audioAssetTrack = [[audioAsset tracksWithMediaType:AVMediaTypeAudio] firstObject];
+    //
+    //    // 加入合成轨道之中
+    //
+    //    [audioTrack insertTimeRange:audioTimeRange ofTrack:audioAssetTrack atTime:nextClistartTime error:nil];
+    //
+    //
+    //
+    ///*
+    //    //调整视频音量
+    //    AVMutableAudioMix *mutableAudioMix = [AVMutableAudioMix audioMix];
+    //    // Create the audio mix input parameters object.
+    //    AVMutableAudioMixInputParameters *mixParameters = [AVMutableAudioMixInputParameters audioMixInputParametersWithTrack:audioTrack];
+    //    // Set the volume ramp to slowly fade the audio out over the duration of the composition.
+    ////    [mixParameters setVolumeRampFromStartVolume:1.f toEndVolume:0.f timeRange:CMTimeRangeMake(kCMTimeZero, mutableComposition.duration)];
+    //    [mixParameters setVolume:.05f atTime:kCMTimeZero];
+    //    // Attach the input parameters to the audio mix.
+    //    mutableAudioMix.inputParameters = @[mixParameters];
+    // */
+    //
+    //
+    //    // 原音频轨道
+    ////    AVMutableCompositionTrack *audioTrack2 = [comosition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
+    ////     AVAssetTrack *audioAssetTrack2 = [[videoAsset tracksWithMediaType:AVMediaTypeAudio] firstObject];
+    ////    [audioTrack2 insertTimeRange:audioTimeRange ofTrack:audioAssetTrack2 atTime:nextClistartTime error:nil];
+    //
+    //
+    //    if (!_editTheOriginaBtn.selected) {
+    //        AVMutableAudioMix *mutableAudioMix = [AVMutableAudioMix audioMix];
+    //        // Create the audio mix input parameters object.
+    //        AVMutableAudioMixInputParameters *mixParameters = [AVMutableAudioMixInputParameters audioMixInputParametersWithTrack:audioTrack];
+    //        // Set the volume ramp to slowly fade the audio out over the duration of the composition.
+    //        //    [mixParameters setVolumeRampFromStartVolume:1.f toEndVolume:0.f timeRange:CMTimeRangeMake(kCMTimeZero, mutableComposition.duration)];
+    //        [mixParameters setVolume:.5f atTime:kCMTimeZero];
+    //        // Attach the input parameters to the audio mix.
+    //        mutableAudioMix.inputParameters = @[mixParameters];
+    //
+    //        AVMutableCompositionTrack *audioTrack2 = [comosition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
+    //         AVAssetTrack *audioAssetTrack2 = [[videoAsset tracksWithMediaType:AVMediaTypeAudio] firstObject];
+    //        [audioTrack2 insertTimeRange:audioTimeRange ofTrack:audioAssetTrack2 atTime:nextClistartTime error:nil];
+    //
+    //
+    //        //视频贴图
+    //        CGSize videoSize = [videoTrack naturalSize];
+    //        CALayer* aLayer = [CALayer layer];
+    //        UIImage* waterImg = _stickersImgView.image;
+    //        aLayer.contents = (id)waterImg.CGImage;
+    //
+    //        float bili = 720/ScreenWidth;
+    //
+    //
+    //        aLayer.frame = CGRectMake(_stickersImgView.frame.origin.x * bili,1280 - _stickersImgView.frame.origin.y *bili - 150*bili, 150*bili, 150*bili);
+    //        aLayer.opacity = 1;
+    //
+    //        CALayer *parentLayer = [CALayer layer];
+    //        CALayer *videoLayer = [CALayer layer];
+    //        parentLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
+    //        videoLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
+    //        [parentLayer addSublayer:videoLayer];
+    //        [parentLayer addSublayer:aLayer];
+    //        AVMutableVideoComposition* videoComp = [AVMutableVideoComposition videoComposition];
+    //        videoComp.renderSize = videoSize;
+    //
+    //
+    //        videoComp.frameDuration = CMTimeMake(1, 30);
+    //        videoComp.animationTool = [AVVideoCompositionCoreAnimationTool videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer inLayer:parentLayer];
+    //        AVMutableVideoCompositionInstruction* instruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
+    //
+    //        instruction.timeRange = CMTimeRangeMake(kCMTimeZero, [comosition duration]);
+    //        AVAssetTrack* mixVideoTrack = [[comosition tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
+    //        AVMutableVideoCompositionLayerInstruction* layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:mixVideoTrack];
+    //        instruction.layerInstructions = [NSArray arrayWithObject:layerInstruction];
+    //        videoComp.instructions = [NSArray arrayWithObject: instruction];
+    //
+    //        AVAssetExportSession *assetExport = [[AVAssetExportSession alloc] initWithAsset:comosition presetName:AVAssetExportPreset1280x720];
+    //
+    //        assetExport.audioMix = mutableAudioMix;
+    //
+    //        assetExport.videoComposition = videoComp;
+    //        // 输出类型
+    //
+    //        assetExport.outputFileType = AVFileTypeMPEG4;
+    //
+    //        // 输出地址
+    //
+    //        assetExport.outputURL = outputFileUrl;
+    //
+    //        // 优化
+    //
+    //        assetExport.shouldOptimizeForNetworkUse = YES;
+    //
+    //        // 合成完毕
+    //
+    //        [assetExport exportAsynchronouslyWithCompletionHandler:^{
+    //
+    //            // 回到主线程
+    //
+    //            dispatch_async(dispatch_get_main_queue(), ^{
+    //
+    //                [self compressVideoWithInputVideoUrl:outputFileUrl];
+    //
+    //            });
+    //        }];
+    //    }else
+    //    {
+    //
+    //        //视频贴图
+    //        CGSize videoSize = [videoTrack naturalSize];
+    //        CALayer* aLayer = [CALayer layer];
+    //        UIImage* waterImg = _stickersImgView.image;
+    //        aLayer.contents = (id)waterImg.CGImage;
+    //        float bili = 720/ScreenWidth;
+    //        aLayer.frame = CGRectMake(_stickersImgView.frame.origin.x * bili,1280 - _stickersImgView.frame.origin.y *bili - 150*bili, 150*bili, 150*bili);
+    //        aLayer.opacity = 1;
+    //
+    //        CALayer *parentLayer = [CALayer layer];
+    //        CALayer *videoLayer = [CALayer layer];
+    //        parentLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
+    //        videoLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
+    //        [parentLayer addSublayer:videoLayer];
+    //        [parentLayer addSublayer:aLayer];
+    //        AVMutableVideoComposition* videoComp = [AVMutableVideoComposition videoComposition];
+    //        videoComp.renderSize = videoSize;
+    //
+    //
+    //        videoComp.frameDuration = CMTimeMake(1, 30);
+    //        videoComp.animationTool = [AVVideoCompositionCoreAnimationTool videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer inLayer:parentLayer];
+    //        AVMutableVideoCompositionInstruction* instruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
+    //
+    //        instruction.timeRange = CMTimeRangeMake(kCMTimeZero, [comosition duration]);
+    //        AVAssetTrack* mixVideoTrack = [[comosition tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
+    //        AVMutableVideoCompositionLayerInstruction* layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:mixVideoTrack];
+    //        instruction.layerInstructions = [NSArray arrayWithObject:layerInstruction];
+    //        videoComp.instructions = [NSArray arrayWithObject: instruction];
+    //
+    //        // 创建一个输出
+    //
+    //        AVAssetExportSession *assetExport = [[AVAssetExportSession alloc] initWithAsset:comosition presetName:AVAssetExportPreset1280x720];
+    //
+    //        assetExport.videoComposition = videoComp;
+    //        //    assetExport.audioMix = mutableAudioMix;
+    //        // 输出类型
+    //
+    //        assetExport.outputFileType = AVFileTypeMPEG4;
+    //
+    //        // 输出地址
+    //
+    //        assetExport.outputURL = outputFileUrl;
+    //
+    //        // 优化
+    //
+    //        assetExport.shouldOptimizeForNetworkUse = YES;
+    //
+    //        // 合成完毕
+    //
+    //        [assetExport exportAsynchronouslyWithCompletionHandler:^{
+    //
+    //            // 回到主线程
+    //
+    //            dispatch_async(dispatch_get_main_queue(), ^{
+    //
+    //                [self compressVideoWithInputVideoUrl:outputFileUrl];
+    //
+    //            });
+    //        }];
+    //
+    //    }
     
     
     
@@ -1022,75 +1017,75 @@ typedef NS_ENUM(NSUInteger , choseType)
     
     [videoTrack insertTimeRange:videoTimeRange ofTrack:videoAssetTrack atTime:nextClistartTime error:nil];
     
-
+    
     
     // 因为视频短这里就直接用视频长度了,如果自动化需要自己写判断
     
     CMTimeRange audioTimeRange = videoTimeRange;
     
-        AVMutableCompositionTrack *audioTrack2 = [comosition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
-        AVAssetTrack *audioAssetTrack2 = [[videoAsset tracksWithMediaType:AVMediaTypeAudio] firstObject];
-        [audioTrack2 insertTimeRange:audioTimeRange ofTrack:audioAssetTrack2 atTime:nextClistartTime error:nil];
+    AVMutableCompositionTrack *audioTrack2 = [comosition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
+    AVAssetTrack *audioAssetTrack2 = [[videoAsset tracksWithMediaType:AVMediaTypeAudio] firstObject];
+    [audioTrack2 insertTimeRange:audioTimeRange ofTrack:audioAssetTrack2 atTime:nextClistartTime error:nil];
+    
+    //视频贴图
+    CGSize videoSize = [videoTrack naturalSize];
+    CALayer* aLayer = [CALayer layer];
+    UIImage* waterImg = _stickersImgView.image;
+    aLayer.contents = (id)waterImg.CGImage;
+    float bili = 720/SCREEN_WIDTH;
+    aLayer.frame = CGRectMake(_stickersImgView.frame.origin.x * bili,1280 - _stickersImgView.frame.origin.y *bili - 150*bili, 150*bili, 150*bili);
+    aLayer.opacity = 1;
+    
+    CALayer *parentLayer = [CALayer layer];
+    CALayer *videoLayer = [CALayer layer];
+    parentLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
+    videoLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
+    [parentLayer addSublayer:videoLayer];
+    [parentLayer addSublayer:aLayer];
+    AVMutableVideoComposition* videoComp = [AVMutableVideoComposition videoComposition];
+    videoComp.renderSize = videoSize;
+    
+    
+    videoComp.frameDuration = CMTimeMake(1, 30);
+    videoComp.animationTool = [AVVideoCompositionCoreAnimationTool videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer inLayer:parentLayer];
+    AVMutableVideoCompositionInstruction* instruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
+    
+    instruction.timeRange = CMTimeRangeMake(kCMTimeZero, [comosition duration]);
+    AVAssetTrack* mixVideoTrack = [[comosition tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
+    AVMutableVideoCompositionLayerInstruction* layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:mixVideoTrack];
+    instruction.layerInstructions = [NSArray arrayWithObject:layerInstruction];
+    videoComp.instructions = [NSArray arrayWithObject: instruction];
+    
+    // 创建一个输出
+    
+    AVAssetExportSession *assetExport = [[AVAssetExportSession alloc] initWithAsset:comosition presetName:AVAssetExportPreset1280x720];
+    
+    assetExport.videoComposition = videoComp;
+    //    assetExport.audioMix = mutableAudioMix;
+    // 输出类型
+    
+    assetExport.outputFileType = AVFileTypeMPEG4;
+    
+    // 输出地址
+    
+    assetExport.outputURL = outputFileUrl;
+    
+    // 优化
+    
+    assetExport.shouldOptimizeForNetworkUse = YES;
+    
+    // 合成完毕
+    
+    [assetExport exportAsynchronouslyWithCompletionHandler:^{
         
-        //视频贴图
-        CGSize videoSize = [videoTrack naturalSize];
-        CALayer* aLayer = [CALayer layer];
-        UIImage* waterImg = _stickersImgView.image;
-        aLayer.contents = (id)waterImg.CGImage;
-        float bili = 720/SCREEN_WIDTH;
-        aLayer.frame = CGRectMake(_stickersImgView.frame.origin.x * bili,1280 - _stickersImgView.frame.origin.y *bili - 150*bili, 150*bili, 150*bili);
-        aLayer.opacity = 1;
+        // 回到主线程
         
-        CALayer *parentLayer = [CALayer layer];
-        CALayer *videoLayer = [CALayer layer];
-        parentLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
-        videoLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
-        [parentLayer addSublayer:videoLayer];
-        [parentLayer addSublayer:aLayer];
-        AVMutableVideoComposition* videoComp = [AVMutableVideoComposition videoComposition];
-        videoComp.renderSize = videoSize;
-        
-        
-        videoComp.frameDuration = CMTimeMake(1, 30);
-        videoComp.animationTool = [AVVideoCompositionCoreAnimationTool videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer inLayer:parentLayer];
-        AVMutableVideoCompositionInstruction* instruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
-        
-        instruction.timeRange = CMTimeRangeMake(kCMTimeZero, [comosition duration]);
-        AVAssetTrack* mixVideoTrack = [[comosition tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
-        AVMutableVideoCompositionLayerInstruction* layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:mixVideoTrack];
-        instruction.layerInstructions = [NSArray arrayWithObject:layerInstruction];
-        videoComp.instructions = [NSArray arrayWithObject: instruction];
-        
-        // 创建一个输出
-        
-        AVAssetExportSession *assetExport = [[AVAssetExportSession alloc] initWithAsset:comosition presetName:AVAssetExportPreset1280x720];
-        
-        assetExport.videoComposition = videoComp;
-        //    assetExport.audioMix = mutableAudioMix;
-        // 输出类型
-        
-        assetExport.outputFileType = AVFileTypeMPEG4;
-        
-        // 输出地址
-        
-        assetExport.outputURL = outputFileUrl;
-        
-        // 优化
-        
-        assetExport.shouldOptimizeForNetworkUse = YES;
-        
-        // 合成完毕
-        
-        [assetExport exportAsynchronouslyWithCompletionHandler:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
             
-            // 回到主线程
+            [self compressVideoWithInputVideoUrl:outputFileUrl];
             
-            dispatch_async(dispatch_get_main_queue(), ^{
-                
-                [self compressVideoWithInputVideoUrl:outputFileUrl];
-                
-            });
-        }];
+        });
+    }];
 }
 
 //有音乐
@@ -1360,7 +1355,7 @@ typedef NS_ENUM(NSUInteger , choseType)
 //点击音乐
 -(void)clickOKBtn
 {
-//    [self showEditMusicBar:_musicBtn];
+    //    [self showEditMusicBar:_musicBtn];
     if (self.choseEditType == choseMusic) {
         
     }else
@@ -1373,9 +1368,9 @@ typedef NS_ENUM(NSUInteger , choseType)
         _collectionView.hidden = YES;
         _musicCollectionView.hidden = NO;
         _stickersCollectionView.hidden = YES;
-
         
-
+        
+        
     }
     if (_audioPath) {
         _editTheOriginaBtn.hidden = NO;
@@ -1404,9 +1399,9 @@ typedef NS_ENUM(NSUInteger , choseType)
 //点击滤镜
 -(void)clickCancleBtn
 {
-//    [self showEditMusicBar:_musicBtn];
-//    _audioPath = nil;
-//    [_audioPlayer pause];
+    //    [self showEditMusicBar:_musicBtn];
+    //    _audioPath = nil;
+    //    [_audioPlayer pause];
     _editTheOriginaBtn.hidden = YES;
     _editTheOriginaSwitch.hidden = YES;
     if (self.choseEditType == choseFilter) {
@@ -1421,7 +1416,7 @@ typedef NS_ENUM(NSUInteger , choseType)
         _collectionView.hidden = NO;
         _musicCollectionView.hidden = YES;
         _stickersCollectionView.hidden = YES;
-
+        
         
     }
 }
@@ -1510,7 +1505,7 @@ typedef NS_ENUM(NSUInteger , choseType)
     FilterData* filter5 = [self createWithName:@"Sketch" andFlieName:@"GPUImageSketchFilter" andValue:nil];
     FilterData* filter6 = [self createWithName:@"SoftElegance" andFlieName:@"GPUImageSoftEleganceFilter" andValue:nil];
     FilterData* filter7 = [self createWithName:@"Toon" andFlieName:@"GPUImageToonFilter" andValue:nil];
-
+    
     FilterData* filter8 = [[FilterData alloc] init];
     filter8.name = @"Saturation0";
     filter8.iconPath = [[NSBundle mainBundle] pathForResource:@"GPUImageSaturationFilter0" ofType:@"png"];
@@ -1655,7 +1650,7 @@ typedef NS_ENUM(NSUInteger , choseType)
     // 1.从缓存池中取
     if (collectionView == _collectionView) {
         static NSString *cellID = @"MyCollectionCell";
-        MusicItemCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
+        AlpMusicItemCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
         FilterData* data = [_filterAry objectAtIndex:indexPath.row];
         cell.iconImgView.image = [UIImage imageWithContentsOfFile:data.iconPath];
         cell.nameLabel.text = data.name;
@@ -1665,7 +1660,7 @@ typedef NS_ENUM(NSUInteger , choseType)
     }else if (collectionView == _stickersCollectionView)
     {
         static NSString *cellID = @"MyCollectionCell3";
-        MusicItemCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
+        AlpMusicItemCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
         StickersData* data = [_stickersAry objectAtIndex:indexPath.row];
         cell.iconImgView.image = [UIImage imageWithContentsOfFile:data.StickersImgPaht];
         cell.nameLabel.text = data.name;
@@ -1674,7 +1669,7 @@ typedef NS_ENUM(NSUInteger , choseType)
         return cell;
     }else{
         static NSString *cellID2 = @"MyCollectionCell2";
-        MusicItemCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:cellID2 forIndexPath:indexPath];
+        AlpMusicItemCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:cellID2 forIndexPath:indexPath];
         MusicData* data = [_musicAry objectAtIndex:indexPath.row];
         UIImage* image = [UIImage imageWithContentsOfFile:data.iconPath];
         cell.iconImgView.image = image;
@@ -1714,7 +1709,7 @@ typedef NS_ENUM(NSUInteger , choseType)
             filter = [[NSClassFromString(_filtClassName) alloc] init];
             [movieFile addTarget:filter];
             [filter addTarget:_filterView];
-
+            
             
         }else
         {
@@ -1729,23 +1724,23 @@ typedef NS_ENUM(NSUInteger , choseType)
                 xxxxfilter.saturation = [data.value floatValue];
                 _saturationValue = [data.value floatValue];
                 filter = xxxxfilter;
-
+                
             }else{
                 filter = [[NSClassFromString(_filtClassName) alloc] init];
             }
             [movieFile addTarget:filter];
             
             // Only rotate the video for display, leave orientation the same for recording
-//            GPUImageView *filterView = (GPUImageView *)self.view;
+            //            GPUImageView *filterView = (GPUImageView *)self.view;
             [filter addTarget:_filterView];
         }
-    
+        
     }else if (collectionView == _stickersCollectionView){
         _nowStickersIndex = indexPath;
         if (_lastStickersIndex.row != _nowStickersIndex.row) {
             
             //1.修改数据源
-//            FilterData* dataNow = [_filterAry objectAtIndex:indexPath.row];
+            //            FilterData* dataNow = [_filterAry objectAtIndex:indexPath.row];
             StickersData* dataNow = [_stickersAry objectAtIndex:indexPath.row];
             dataNow.isSelected = YES;
             [_stickersAry replaceObjectAtIndex:indexPath.row withObject:dataNow];
@@ -1801,7 +1796,7 @@ typedef NS_ENUM(NSUInteger , choseType)
             [self playMusic];
             _editTheOriginaBtn.hidden = NO;
             _editTheOriginaSwitch.hidden = NO;
-
+            
         }
     }
     
@@ -1811,7 +1806,7 @@ typedef NS_ENUM(NSUInteger , choseType)
 {
     [[UIApplication sharedApplication] setStatusBarHidden:NO];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-//    [[NSNotificationCenter defaultCenter] postNotificationName:kTabBarHiddenNONotification object:self];
+    //    [[NSNotificationCenter defaultCenter] postNotificationName:kTabBarHiddenNONotification object:self];
     [self.navigationController popToRootViewControllerAnimated:NO];
 }
 - (void)didReceiveMemoryWarning {
@@ -1835,7 +1830,7 @@ typedef NS_ENUM(NSUInteger , choseType)
     }
 }
 - (BOOL)prefersStatusBarHidden {
-  return YES;
+    return YES;
 }
 
 -(void)dealloc
@@ -1843,5 +1838,6 @@ typedef NS_ENUM(NSUInteger , choseType)
     NSLog(@"EditVideoViewController 释放了");
     
 }
+
 
 @end

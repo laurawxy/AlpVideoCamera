@@ -1,23 +1,21 @@
 //
-//  MusicItemCollectionViewCell.m
-//  addproject
+//  AlpMusicItemCollectionViewCell.m
+//  AlpVideoCamera
 //
-//  Created by 胡阳阳 on 17/3/3.
-//  Copyright © 2017年 mac. All rights reserved.
+//  Created by xiaoyuan on 2018/9/13.
+//  Copyright © 2018 xiaoyuan. All rights reserved.
 //
 
-#import "MusicItemCollectionViewCell.h"
+#import "AlpMusicItemCollectionViewCell.h"
 #import "UIView+Tools.h"
 #import "Masonry.h"
-@implementation MusicItemCollectionViewCell
--(instancetype)initWithFrame:(CGRect)frame
-{
+
+@implementation AlpMusicItemCollectionViewCell
+
+- (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-//        self.backgroundColor = [UIColor colorWithRed:arc4random_uniform(255)/255.0 green:arc4random_uniform(255)/255.0 blue:arc4random_uniform(255)/255.0 alpha:1];
         
-//        83, 115
-
         _iconImgView = [[UIImageView alloc] init];
         [self addSubview:_iconImgView];
         [_iconImgView mas_makeConstraints:^(MASConstraintMaker *make) {

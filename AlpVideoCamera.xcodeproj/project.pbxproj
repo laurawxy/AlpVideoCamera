@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D07D1AC5214A586A00162D30 /* AlpEditingPublishingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D07D1AC4214A586A00162D30 /* AlpEditingPublishingViewController.m */; };
+		D07D1AC8214A59AA00162D30 /* AlpEditVideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D07D1AC7214A59AA00162D30 /* AlpEditVideoViewController.m */; };
+		D07D1ACB214A5AFF00162D30 /* AlpMusicItemCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D07D1ACA214A5AFF00162D30 /* AlpMusicItemCollectionViewCell.m */; };
 		D09D27CB2148BB650097B0EF /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D09D27CA2148BB650097B0EF /* AppDelegate.m */; };
 		D09D27CE2148BB650097B0EF /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D09D27CD2148BB650097B0EF /* ViewController.m */; };
 		D09D27D32148BB670097B0EF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D09D27D22148BB670097B0EF /* Assets.xcassets */; };
@@ -184,7 +187,6 @@
 		D09D29E52148BCD90097B0EF /* GPUImageLightenBlendFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = D09D29342148BCD80097B0EF /* GPUImageLightenBlendFilter.m */; };
 		D09D29E62148BCD90097B0EF /* GPUImageCGAColorspaceFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = D09D29372148BCD80097B0EF /* GPUImageCGAColorspaceFilter.m */; };
 		D09D29E72148BCD90097B0EF /* GPUImageDarkenBlendFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = D09D293B2148BCD80097B0EF /* GPUImageDarkenBlendFilter.m */; };
-		D09D2AFA2148CB370097B0EF /* EditingPublishingDynamicViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D09D29FD2148CB370097B0EF /* EditingPublishingDynamicViewController.m */; };
 		D09D2AFB2148CB370097B0EF /* music1.json in Resources */ = {isa = PBXBuildFile; fileRef = D09D29FF2148CB370097B0EF /* music1.json */; };
 		D09D2AFC2148CB370097B0EF /* icon548.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A012148CB370097B0EF /* icon548.png */; };
 		D09D2AFD2148CB370097B0EF /* audio548.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A022148CB370097B0EF /* audio548.mp3 */; };
@@ -264,8 +266,6 @@
 		D09D2B482148CB380097B0EF /* stickers541.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A612148CB370097B0EF /* stickers541.jpg */; };
 		D09D2B492148CB380097B0EF /* stickers540.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A622148CB370097B0EF /* stickers540.jpg */; };
 		D09D2B4A2148CB380097B0EF /* stickers554.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A632148CB370097B0EF /* stickers554.jpg */; };
-		D09D2B4B2148CB380097B0EF /* EditVideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D09D2A662148CB370097B0EF /* EditVideoViewController.m */; };
-		D09D2B4C2148CB380097B0EF /* MusicItemCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D09D2A672148CB370097B0EF /* MusicItemCollectionViewCell.m */; };
 		D09D2B4D2148CB380097B0EF /* SDAVAssetExportSession.m in Sources */ = {isa = PBXBuildFile; fileRef = D09D2A6B2148CB370097B0EF /* SDAVAssetExportSession.m */; };
 		D09D2B4E2148CB380097B0EF /* lookup_soft_elegance_2.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A6D2148CB370097B0EF /* lookup_soft_elegance_2.png */; };
 		D09D2B4F2148CB380097B0EF /* lookup_soft_elegance_1.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A6E2148CB370097B0EF /* lookup_soft_elegance_1.png */; };
@@ -323,6 +323,12 @@
 /* Begin PBXFileReference section */
 		1B254D780EB7B31891BCF4E2 /* Pods-AlpVideoCamera.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AlpVideoCamera.release.xcconfig"; path = "Pods/Target Support Files/Pods-AlpVideoCamera/Pods-AlpVideoCamera.release.xcconfig"; sourceTree = "<group>"; };
 		CADB371C0B6A5A9FB848C148 /* libPods-AlpVideoCamera.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AlpVideoCamera.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D07D1AC3214A586A00162D30 /* AlpEditingPublishingViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlpEditingPublishingViewController.h; sourceTree = "<group>"; };
+		D07D1AC4214A586A00162D30 /* AlpEditingPublishingViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AlpEditingPublishingViewController.m; sourceTree = "<group>"; };
+		D07D1AC6214A59AA00162D30 /* AlpEditVideoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlpEditVideoViewController.h; sourceTree = "<group>"; };
+		D07D1AC7214A59AA00162D30 /* AlpEditVideoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AlpEditVideoViewController.m; sourceTree = "<group>"; };
+		D07D1AC9214A5AFF00162D30 /* AlpMusicItemCollectionViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlpMusicItemCollectionViewCell.h; sourceTree = "<group>"; };
+		D07D1ACA214A5AFF00162D30 /* AlpMusicItemCollectionViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AlpMusicItemCollectionViewCell.m; sourceTree = "<group>"; };
 		D09D27C62148BB650097B0EF /* AlpVideoCamera.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AlpVideoCamera.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D09D27C92148BB650097B0EF /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		D09D27CA2148BB650097B0EF /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -678,7 +684,6 @@
 		D09D29392148BCD80097B0EF /* GPUImageStretchDistortionFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPUImageStretchDistortionFilter.h; sourceTree = "<group>"; };
 		D09D293A2148BCD80097B0EF /* GLProgram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLProgram.h; sourceTree = "<group>"; };
 		D09D293B2148BCD80097B0EF /* GPUImageDarkenBlendFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPUImageDarkenBlendFilter.m; sourceTree = "<group>"; };
-		D09D29FD2148CB370097B0EF /* EditingPublishingDynamicViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditingPublishingDynamicViewController.m; sourceTree = "<group>"; };
 		D09D29FF2148CB370097B0EF /* music1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = music1.json; sourceTree = "<group>"; };
 		D09D2A012148CB370097B0EF /* icon548.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon548.png; sourceTree = "<group>"; };
 		D09D2A022148CB370097B0EF /* audio548.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = audio548.mp3; sourceTree = "<group>"; };
@@ -758,11 +763,7 @@
 		D09D2A612148CB370097B0EF /* stickers541.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = stickers541.jpg; sourceTree = "<group>"; };
 		D09D2A622148CB370097B0EF /* stickers540.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = stickers540.jpg; sourceTree = "<group>"; };
 		D09D2A632148CB370097B0EF /* stickers554.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = stickers554.jpg; sourceTree = "<group>"; };
-		D09D2A642148CB370097B0EF /* MusicItemCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicItemCollectionViewCell.h; sourceTree = "<group>"; };
 		D09D2A652148CB370097B0EF /* UIView+Tools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Tools.h"; sourceTree = "<group>"; };
-		D09D2A662148CB370097B0EF /* EditVideoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditVideoViewController.m; sourceTree = "<group>"; };
-		D09D2A672148CB370097B0EF /* MusicItemCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MusicItemCollectionViewCell.m; sourceTree = "<group>"; };
-		D09D2A682148CB370097B0EF /* EditVideoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditVideoViewController.h; sourceTree = "<group>"; };
 		D09D2A6B2148CB370097B0EF /* SDAVAssetExportSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SDAVAssetExportSession.m; sourceTree = "<group>"; };
 		D09D2A6D2148CB370097B0EF /* lookup_soft_elegance_2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = lookup_soft_elegance_2.png; sourceTree = "<group>"; };
 		D09D2A6E2148CB370097B0EF /* lookup_soft_elegance_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = lookup_soft_elegance_1.png; sourceTree = "<group>"; };
@@ -800,7 +801,6 @@
 		D09D2A8F2148CB370097B0EF /* complete@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "complete@3x.png"; sourceTree = "<group>"; };
 		D09D2A902148CB370097B0EF /* complete@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "complete@2x.png"; sourceTree = "<group>"; };
 		D09D2A912148CB370097B0EF /* beautyOFF@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "beautyOFF@2x.png"; sourceTree = "<group>"; };
-		D09D2A922148CB370097B0EF /* EditingPublishingDynamicViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditingPublishingDynamicViewController.h; sourceTree = "<group>"; };
 		D09D2A932148CB370097B0EF /* UIView+Tools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Tools.m"; sourceTree = "<group>"; };
 		D09D2A952148CB370097B0EF /* SDAVAssetExportSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDAVAssetExportSession.h; sourceTree = "<group>"; };
 		D09D2AEF2148CB370097B0EF /* LFGPUImageEmptyFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFGPUImageEmptyFilter.h; sourceTree = "<group>"; };
@@ -1268,24 +1268,24 @@
 		D09D29FC2148CB370097B0EF /* CustomVideoCamera */ = {
 			isa = PBXGroup;
 			children = (
-				D09D29FD2148CB370097B0EF /* EditingPublishingDynamicViewController.m */,
-				D09D29FE2148CB370097B0EF /* music */,
 				D213E8A021496251002B8E63 /* AlpVideoCameraViewController.h */,
 				D213E8A121496251002B8E63 /* AlpVideoCameraViewController.m */,
 				D213E8A321496B7E002B8E63 /* ALPVideoCameraView.h */,
 				D213E8A421496B7E002B8E63 /* ALPVideoCameraView.m */,
-				D09D2A3E2148CB370097B0EF /* stickers */,
-				D09D2A642148CB370097B0EF /* MusicItemCollectionViewCell.h */,
+				D07D1AC9214A5AFF00162D30 /* AlpMusicItemCollectionViewCell.h */,
+				D07D1ACA214A5AFF00162D30 /* AlpMusicItemCollectionViewCell.m */,
 				D09D2A652148CB370097B0EF /* UIView+Tools.h */,
-				D09D2A662148CB370097B0EF /* EditVideoViewController.m */,
-				D09D2A672148CB370097B0EF /* MusicItemCollectionViewCell.m */,
-				D09D2A682148CB370097B0EF /* EditVideoViewController.h */,
+				D09D2A932148CB370097B0EF /* UIView+Tools.m */,
+				D07D1AC6214A59AA00162D30 /* AlpEditVideoViewController.h */,
+				D07D1AC7214A59AA00162D30 /* AlpEditVideoViewController.m */,
 				D09D2A6B2148CB370097B0EF /* SDAVAssetExportSession.m */,
+				D09D2A952148CB370097B0EF /* SDAVAssetExportSession.h */,
+				D07D1AC3214A586A00162D30 /* AlpEditingPublishingViewController.h */,
+				D07D1AC4214A586A00162D30 /* AlpEditingPublishingViewController.m */,
+				D09D29FE2148CB370097B0EF /* music */,
+				D09D2A3E2148CB370097B0EF /* stickers */,
 				D09D2A6C2148CB370097B0EF /* filterImage */,
 				D09D2A7B2148CB370097B0EF /* cammerImg */,
-				D09D2A922148CB370097B0EF /* EditingPublishingDynamicViewController.h */,
-				D09D2A932148CB370097B0EF /* UIView+Tools.m */,
-				D09D2A952148CB370097B0EF /* SDAVAssetExportSession.h */,
 			);
 			path = CustomVideoCamera;
 			sourceTree = "<group>";
@@ -1810,7 +1810,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AlpVideoCamera/Pods-AlpVideoCamera-resources.sh",
+				"${SRCROOT}/Pods/Target Support Files/Pods-AlpVideoCamera/Pods-AlpVideoCamera-resources.sh",
 				"${PODS_ROOT}/TZImagePickerController/TZImagePickerController/TZImagePickerController/TZImagePickerController.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
@@ -1819,7 +1819,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AlpVideoCamera/Pods-AlpVideoCamera-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-AlpVideoCamera/Pods-AlpVideoCamera-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		36E45EE12AB6B91ECFB47F89 /* [CP] Check Pods Manifest.lock */ = {
@@ -1852,7 +1852,6 @@
 				D09D29BA2148BCD80097B0EF /* GPUImageRGBErosionFilter.m in Sources */,
 				D09D299D2148BCD80097B0EF /* GPUImageGaussianBlurFilter.m in Sources */,
 				D09D29412148BCD80097B0EF /* GPUImageLuminanceThresholdFilter.m in Sources */,
-				D09D2AFA2148CB370097B0EF /* EditingPublishingDynamicViewController.m in Sources */,
 				D09D29B02148BCD80097B0EF /* GPUImageSmoothToonFilter.m in Sources */,
 				D09D29472148BCD80097B0EF /* GPUImageSoftEleganceFilter.m in Sources */,
 				D09D29B92148BCD80097B0EF /* GPUImageRawDataInput.m in Sources */,
@@ -1903,7 +1902,6 @@
 				D09D29AB2148BCD80097B0EF /* GPUImageContrastFilter.m in Sources */,
 				D09D29AD2148BCD80097B0EF /* GPUImageHalftoneFilter.m in Sources */,
 				D09D29712148BCD80097B0EF /* GPUImageHardLightBlendFilter.m in Sources */,
-				D09D2B4B2148CB380097B0EF /* EditVideoViewController.m in Sources */,
 				D09D294B2148BCD80097B0EF /* GPUImageHighlightShadowTintFilter.m in Sources */,
 				D09D29882148BCD80097B0EF /* GPUImageDirectionalSobelEdgeDetectionFilter.m in Sources */,
 				D09D29952148BCD80097B0EF /* GPUImageTiltShiftFilter.m in Sources */,
@@ -1915,6 +1913,7 @@
 				D09D29612148BCD80097B0EF /* GPUImageHueFilter.m in Sources */,
 				D09D29A52148BCD80097B0EF /* GPUImageSubtractBlendFilter.m in Sources */,
 				D09D29CC2148BCD90097B0EF /* GPUImageTextureOutput.m in Sources */,
+				D07D1AC8214A59AA00162D30 /* AlpEditVideoViewController.m in Sources */,
 				D09D297D2148BCD80097B0EF /* GPUImage3x3TextureSamplingFilter.m in Sources */,
 				D09D2B722148CB380097B0EF /* UIView+Tools.m in Sources */,
 				D09D29862148BCD80097B0EF /* GPUImageDivideBlendFilter.m in Sources */,
@@ -1944,6 +1943,7 @@
 				D09D29DE2148BCD90097B0EF /* GPUImagePolkaDotFilter.m in Sources */,
 				D09D29BF2148BCD80097B0EF /* GPUImageClosingFilter.m in Sources */,
 				D09D29DF2148BCD90097B0EF /* GPUImageBulgeDistortionFilter.m in Sources */,
+				D07D1ACB214A5AFF00162D30 /* AlpMusicItemCollectionViewCell.m in Sources */,
 				D09D29912148BCD80097B0EF /* GPUImageBoxBlurFilter.m in Sources */,
 				D09D29492148BCD80097B0EF /* GPUImageGaussianBlurPositionFilter.m in Sources */,
 				D09D295A2148BCD80097B0EF /* GPUImagePixellatePositionFilter.m in Sources */,
@@ -1965,6 +1965,7 @@
 				D09D298D2148BCD80097B0EF /* GPUImageXYDerivativeFilter.m in Sources */,
 				D09D29652148BCD80097B0EF /* GPUImageBilateralFilter.m in Sources */,
 				D09D29452148BCD80097B0EF /* GPUImageSobelEdgeDetectionFilter.m in Sources */,
+				D07D1AC5214A586A00162D30 /* AlpEditingPublishingViewController.m in Sources */,
 				D09D29482148BCD80097B0EF /* GPUImageTwoPassFilter.m in Sources */,
 				D09D297F2148BCD80097B0EF /* GPUImageRGBClosingFilter.m in Sources */,
 				D09D29992148BCD80097B0EF /* GPUImagePicture+TextureSubimage.m in Sources */,
@@ -1973,7 +1974,6 @@
 				D09D29D72148BCD90097B0EF /* GPUImageSingleComponentGaussianBlurFilter.m in Sources */,
 				D09D29462148BCD80097B0EF /* GPUImageHighPassFilter.m in Sources */,
 				D09D29792148BCD80097B0EF /* GPUImageOpacityFilter.m in Sources */,
-				D09D2B4C2148CB380097B0EF /* MusicItemCollectionViewCell.m in Sources */,
 				D09D29592148BCD80097B0EF /* GPUImageMissEtikateFilter.m in Sources */,
 				D09D299F2148BCD80097B0EF /* GPUImageSharpenFilter.m in Sources */,
 				D09D29402148BCD80097B0EF /* GPUImageChromaKeyFilter.m in Sources */,
