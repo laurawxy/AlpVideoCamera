@@ -115,23 +115,22 @@ typedef NS_ENUM(NSUInteger , choseType)
 
 @implementation AlpEditVideoViewController
 {
-    GPUImageMovie *movieFile;
-    GPUImageMovie* endMovieFile;
-    GPUImageOutput<GPUImageInput> *filter;
+    GPUImageMovie *_movieFile;
+    GPUImageMovie* _endMovieFile;
+    GPUImageOutput<GPUImageInput> *_filter;
     
-    AVPlayerItem *audioPlayerItem;
-    UIImageView* playImg;
-    MBProgressHUD*HUD;
+    AVPlayerItem *_audioPlayerItem;
+    UIImageView* _playImg;
+    MBProgressHUD*_HUD;
     
     
     
-    AVPlayer *mainPlayer;
-    AVPlayerLayer *playerLayer;
-    AVPlayerItem *playerItem;
-    GPUImageMovieWriter *movieWriter;
+    AVPlayer *_mainPlayer;
+    AVPlayerLayer *_playerLayer;
+    AVPlayerItem *_playerItem;
+    GPUImageMovieWriter *_movieWriter;
     
 }
-@synthesize videoURL;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -156,22 +155,23 @@ typedef NS_ENUM(NSUInteger , choseType)
     float videoWidth = self.view.frame.size.width;
     
     
-    mainPlayer = [[AVPlayer alloc] init];
-    playerItem = [[AVPlayerItem alloc] initWithURL:videoURL];
-    [mainPlayer replaceCurrentItemWithPlayerItem:playerItem];
-    playerLayer = [AVPlayerLayer playerLayerWithPlayer:mainPlayer];
+    _mainPlayer = [[AVPlayer alloc] init];
+    _playerItem = [[AVPlayerItem alloc] initWithURL:_videoURL];
+    [_mainPlayer replaceCurrentItemWithPlayerItem:_playerItem];
+    _playerLayer = [AVPlayerLayer playerLayerWithPlayer:_mainPlayer];
     
     
-    movieFile = [[GPUImageMovie alloc] initWithPlayerItem:playerItem];
-    movieFile.runBenchmark = YES; movieFile.playAtActualSpeed = YES;
+    _movieFile = [[GPUImageMovie alloc] initWithPlayerItem:_playerItem];
+    _movieFile.runBenchmark = YES;
+    _movieFile.playAtActualSpeed = YES;
     
-    filter = [[LFGPUImageEmptyFilter alloc] init];
+    _filter = [[LFGPUImageEmptyFilter alloc] init];
     
     _filtClassName = @"LFGPUImageEmptyFilter";
-    [movieFile addTarget:filter];
+    [_movieFile addTarget:_filter];
     _filterView = [[GPUImageView alloc] initWithFrame:self.view.bounds];
     [self.view addSubview:_filterView];
-    [filter addTarget:_filterView];
+    [_filter addTarget:_filterView];
     
     _bgImageView = [[UIImageView alloc] init];
     //    _bgImageView.image = [[AppDelegate appDelegate].cmImageSize getImage:[[videoURL absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
@@ -190,11 +190,11 @@ typedef NS_ENUM(NSUInteger , choseType)
     
     
     
-    playImg = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, 40, 40)];
-    playImg.center = CGPointMake(videoWidth/2, videoWidth/2);
-    [playImg setImage:[UIImage imageNamed:@"videoPlay"]];
-    [playerLayer addSublayer:playImg.layer];
-    playImg.hidden = YES;
+    _playImg = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, 40, 40)];
+    _playImg.center = CGPointMake(videoWidth/2, videoWidth/2);
+    [_playImg setImage:[UIImage imageNamed:@"videoPlay"]];
+    [_playerLayer addSublayer:_playImg.layer];
+    _playImg.hidden = YES;
     
     //create ui
     UIView* superView = self.view;
@@ -516,8 +516,8 @@ typedef NS_ENUM(NSUInteger , choseType)
     
     
     
-    HUD = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    HUD.hidden = YES;
+    _HUD = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    _HUD.hidden = YES;
     
     
     //保存到相册
@@ -527,8 +527,8 @@ typedef NS_ENUM(NSUInteger , choseType)
 {
     [super viewWillAppear:animated];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [mainPlayer play];
-        [movieFile startProcessing];
+        [_mainPlayer play];
+        [_movieFile startProcessing];
     });
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         _bgImageView.hidden = YES;
@@ -589,7 +589,7 @@ typedef NS_ENUM(NSUInteger , choseType)
                  if (compressionEncoder.status == AVAssetExportSessionStatusCompleted)
                  {
                      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                         HUD.hidden = YES;
+                         _HUD.hidden = YES;
                          [[NSNotificationCenter defaultCenter] removeObserver:self];
                          AlpEditingPublishingViewController* cor = [[AlpEditingPublishingViewController alloc] init];
                          cor.videoURL = compressionEncoder.outputURL;
@@ -602,7 +602,7 @@ typedef NS_ENUM(NSUInteger , choseType)
                  else if (compressionEncoder.status == AVAssetExportSessionStatusCancelled)
                  {
                      //                     HUD.labelText = @"Compression Failed";
-                     HUD.label.text = @"Compression Failed";
+                     _HUD.label.text = @"Compression Failed";
                      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                          [[NSNotificationCenter defaultCenter] removeObserver:self];
                          //                         [[NSNotificationCenter defaultCenter] postNotificationName:kTabBarHiddenNONotification object:self];
@@ -612,7 +612,7 @@ typedef NS_ENUM(NSUInteger , choseType)
                  }
                  else
                  {
-                     HUD.label.text = @"ompression Failed";
+                     _HUD.label.text = @"ompression Failed";
                      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                          [[NSNotificationCenter defaultCenter] removeObserver:self];
                          //                         [[NSNotificationCenter defaultCenter] postNotificationName:kTabBarHiddenNONotification object:self];
@@ -633,34 +633,34 @@ typedef NS_ENUM(NSUInteger , choseType)
 
 -(void)clickNextBtn
 {
-    HUD.hidden = NO;
+    _HUD.hidden = NO;
     if ([_filtClassName isEqualToString:@"LFGPUImageEmptyFilter"]) {
         //无滤镜效果
         if (_audioPath||!_stickersImgView.hidden) {
             //音乐混合
-            [self mixAudioAndVidoWithInputURL:videoURL];
+            [self mixAudioAndVidoWithInputURL:_videoURL];
         }else
         {
-            HUD.label.text = @"视频处理中...";
-            [self compressVideoWithInputVideoUrl:videoURL];
+            _HUD.label.text = @"视频处理中...";
+            [self compressVideoWithInputVideoUrl:_videoURL];
             
         }
     }else
     {
         //添加滤镜效果
-        [self mixFiltWithVideoAndInputVideoURL:videoURL];
+        [self mixFiltWithVideoAndInputVideoURL:_videoURL];
     }
 }
 
 -(void)mixFiltWithVideoAndInputVideoURL:(NSURL*)inputURL;
 {
     
-    HUD.label.text = @"滤镜合成中...";
+    _HUD.label.text = @"滤镜合成中...";
     _isdoing = YES;
     NSURL *sampleURL = inputURL;
-    endMovieFile = [[GPUImageMovie alloc] initWithURL:sampleURL];
-    endMovieFile.runBenchmark = YES;
-    endMovieFile.playAtActualSpeed = NO;
+    _endMovieFile = [[GPUImageMovie alloc] initWithURL:sampleURL];
+    _endMovieFile.runBenchmark = YES;
+    _endMovieFile.playAtActualSpeed = NO;
     
     GPUImageOutput<GPUImageInput> *endFilter;
     if ([_filtClassName isEqualToString:@"GPUImageSaturationFilter"]) {
@@ -674,24 +674,24 @@ typedef NS_ENUM(NSUInteger , choseType)
     
     
     
-    [endMovieFile addTarget:endFilter];
+    [_endMovieFile addTarget:endFilter];
     
     
     NSString *pathToMovie = [NSHomeDirectory() stringByAppendingPathComponent:@"tmp/Movie.mp4"];
     unlink([pathToMovie UTF8String]); // If a file already exists, AVAssetWriter won't let you record new frames, so delete the old movie
     NSURL *movieURL = [NSURL fileURLWithPath:pathToMovie];
     
-    movieWriter = [[GPUImageMovieWriter alloc] initWithMovieURL:movieURL size:CGSizeMake(720.0, 1280.0)];
-    [endFilter  addTarget:movieWriter];
-    movieWriter.shouldPassthroughAudio = YES;
-    endMovieFile.audioEncodingTarget = movieWriter;
-    [endMovieFile enableSynchronizedEncodingUsingMovieWriter:movieWriter];
-    [movieWriter startRecording];
-    [endMovieFile startProcessing];
-    __weak GPUImageMovieWriter *weakmovieWriter = movieWriter;
+    _movieWriter = [[GPUImageMovieWriter alloc] initWithMovieURL:movieURL size:CGSizeMake(720.0, 1280.0)];
+    [endFilter  addTarget:_movieWriter];
+    _movieWriter.shouldPassthroughAudio = YES;
+    _endMovieFile.audioEncodingTarget = _movieWriter;
+    [_endMovieFile enableSynchronizedEncodingUsingMovieWriter:_movieWriter];
+    [_movieWriter startRecording];
+    [_endMovieFile startProcessing];
+    __weak GPUImageMovieWriter *weakmovieWriter = _movieWriter;
     //    __weak MBProgressHUD *weakHUD = HUD;
     typeof(self) __weak weakself = self;
-    [movieWriter setCompletionBlock:^{
+    [_movieWriter setCompletionBlock:^{
         [endFilter removeTarget:weakmovieWriter];
         [weakmovieWriter finishRecording];
         if (weakself.audioPath||!weakself.stickersImgView.hidden) {
@@ -971,7 +971,7 @@ typedef NS_ENUM(NSUInteger , choseType)
     
     
     // 路径
-    HUD.label.text = @"贴纸合成中...";
+    _HUD.label.text = @"贴纸合成中...";
     NSString *documents = [NSHomeDirectory() stringByAppendingPathComponent:@"tmp"];
     
     
@@ -1095,7 +1095,7 @@ typedef NS_ENUM(NSUInteger , choseType)
     //    audio529
     
     // 路径
-    HUD.label.text = @"音乐合成中...";
+    _HUD.label.text = @"音乐合成中...";
     NSString *documents = [NSHomeDirectory() stringByAppendingPathComponent:@"tmp"];
     
     // 声音来源
@@ -1345,10 +1345,10 @@ typedef NS_ENUM(NSUInteger , choseType)
 {
     if (!_editTheOriginaBtn.selected) {
         _editTheOriginaBtn.selected = YES;
-        [mainPlayer setVolume:0];
+        [_mainPlayer setVolume:0];
     }else
     {
-        [mainPlayer setVolume:1];
+        [_mainPlayer setVolume:1];
         _editTheOriginaBtn.selected = NO;
     }
 }
@@ -1547,30 +1547,30 @@ typedef NS_ENUM(NSUInteger , choseType)
     
     
     
-    audioPlayerItem =[AVPlayerItem playerItemWithURL:audioInputUrl];
+    _audioPlayerItem =[AVPlayerItem playerItemWithURL:audioInputUrl];
     
-    [_audioPlayer replaceCurrentItemWithPlayerItem:audioPlayerItem];
+    [_audioPlayer replaceCurrentItemWithPlayerItem:_audioPlayerItem];
     
     [_audioPlayer play];
 }
 
 -(void)playOrPause{
-    if (playImg.isHidden) {
-        playImg.hidden = NO;
-        [mainPlayer pause];
+    if (_playImg.isHidden) {
+        _playImg.hidden = NO;
+        [_mainPlayer pause];
         
     }else{
-        playImg.hidden = YES;
-        [mainPlayer play];
+        _playImg.hidden = YES;
+        [_mainPlayer play];
     }
 }
 
 - (void)pressPlayButton
 {
-    [playerItem seekToTime:kCMTimeZero];
-    [mainPlayer play];
+    [_playerItem seekToTime:kCMTimeZero];
+    [_mainPlayer play];
     if (_audioPath) {
-        [audioPlayerItem seekToTime:kCMTimeZero];
+        [_audioPlayerItem seekToTime:kCMTimeZero];
         [_audioPlayer play];
     }
     
@@ -1591,20 +1591,20 @@ typedef NS_ENUM(NSUInteger , choseType)
 {
     [super viewWillDisappear:animated];
     [_audioPlayer pause];
-    [mainPlayer pause];
-    [movieFile endProcessing];
+    [_mainPlayer pause];
+    [_movieFile endProcessing];
 }
 
 - (void)onApplicationWillResignActive
 {
     
     
-    [mainPlayer pause];
-    [movieFile endProcessing];
+    [_mainPlayer pause];
+    [_movieFile endProcessing];
     if (_isdoing) {
-        [movieWriter cancelRecording];
-        [endMovieFile endProcessing];
-        HUD.hidden = YES;
+        [_movieWriter cancelRecording];
+        [_endMovieFile endProcessing];
+        _HUD.hidden = YES;
     }
     
     
@@ -1612,9 +1612,9 @@ typedef NS_ENUM(NSUInteger , choseType)
 
 - (void)onApplicationDidBecomeActive
 {
-    [playerItem seekToTime:kCMTimeZero];
-    [mainPlayer play];
-    [movieFile startProcessing];
+    [_playerItem seekToTime:kCMTimeZero];
+    [_mainPlayer play];
+    [_movieFile startProcessing];
     
     if (_isdoing) {
         
@@ -1701,19 +1701,19 @@ typedef NS_ENUM(NSUInteger , choseType)
         }
         
         if (indexPath.row == 0) {
-            [movieFile removeAllTargets];
+            [_movieFile removeAllTargets];
             
             
             FilterData* data = [_filterAry objectAtIndex:indexPath.row];
             _filtClassName = data.fillterName;
-            filter = [[NSClassFromString(_filtClassName) alloc] init];
-            [movieFile addTarget:filter];
-            [filter addTarget:_filterView];
+            _filter = [[NSClassFromString(_filtClassName) alloc] init];
+            [_movieFile addTarget:_filter];
+            [_filter addTarget:_filterView];
             
             
         }else
         {
-            [movieFile removeAllTargets];
+            [_movieFile removeAllTargets];
             
             
             FilterData* data = [_filterAry objectAtIndex:indexPath.row];
@@ -1723,16 +1723,16 @@ typedef NS_ENUM(NSUInteger , choseType)
                 GPUImageSaturationFilter* xxxxfilter = [[NSClassFromString(_filtClassName) alloc] init];
                 xxxxfilter.saturation = [data.value floatValue];
                 _saturationValue = [data.value floatValue];
-                filter = xxxxfilter;
+                _filter = xxxxfilter;
                 
             }else{
-                filter = [[NSClassFromString(_filtClassName) alloc] init];
+                _filter = [[NSClassFromString(_filtClassName) alloc] init];
             }
-            [movieFile addTarget:filter];
+            [_movieFile addTarget:_filter];
             
             // Only rotate the video for display, leave orientation the same for recording
             //            GPUImageView *filterView = (GPUImageView *)self.view;
-            [filter addTarget:_filterView];
+            [_filter addTarget:_filterView];
         }
         
     }else if (collectionView == _stickersCollectionView){
@@ -1785,7 +1785,7 @@ typedef NS_ENUM(NSUInteger , choseType)
             
             _editTheOriginaBtn.hidden = YES;
             _editTheOriginaSwitch.hidden = YES;
-            [mainPlayer setVolume:1];
+            [_mainPlayer setVolume:1];
             _editTheOriginaBtn.selected = NO;
             _editTheOriginaSwitch.on = NO;
             

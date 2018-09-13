@@ -8,7 +8,6 @@
 
 #import "AlpMusicItemCollectionViewCell.h"
 #import "UIView+Tools.h"
-#import "Masonry.h"
 
 @implementation AlpMusicItemCollectionViewCell
 

@@ -9,7 +9,6 @@
 #import "AlpVideoCameraViewController.h"
 #import "ALPVideoCameraView.h"
 #import "RTRootNavigationController.h"
-#import <Masonry.h>
 
 @interface AlpVideoCameraViewController () <ALPVideoCameraViewDelegate>
 
