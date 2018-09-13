@@ -412,7 +412,7 @@ typedef NS_ENUM(NSUInteger , choseType)
     
     //collectionView
     UICollectionViewFlowLayout* layout2 = [[UICollectionViewFlowLayout alloc] init];
-    layout2.itemSize = CGSizeMake(83, 115);
+//    layout2.itemSize = CGSizeMake(83, 115);
     layout2.estimatedItemSize = CGSizeMake(83, 115);
     
     //设置分区的头视图和尾视图是否始终固定在屏幕上边和下边
