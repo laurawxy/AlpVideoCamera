@@ -7,11 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "GPUImage.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void(^clickBackToHomeBtnBlock)();
+typedef void(^clickBackToHomeBtnBlock)(void);
 
 @class ALPVideoCameraView;
 
@@ -22,18 +21,7 @@ typedef void(^clickBackToHomeBtnBlock)();
 
 @end
 
-@interface ALPVideoCameraView : UIView {
-    GPUImageVideoCamera *videoCamera;
-    GPUImageOutput<GPUImageInput> *filter;
-    GPUImageMovieWriter *movieWriter;
-    NSString *pathToMovie;
-    GPUImageView *filteredVideoView;
-    CALayer *_focusLayer;
-    NSTimer *myTimer;
-    UILabel *timeLabel;
-    NSDate *fromdate;
-    CGRect mainScreenFrame;
-}
+@interface ALPVideoCameraView : UIView
 
 @property (nonatomic , copy) clickBackToHomeBtnBlock backToHomeBlock;
 

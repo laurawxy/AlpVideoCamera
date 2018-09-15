@@ -20,13 +20,10 @@
 #import "AlpEditingPublishingViewController.h"
 #import <Photos/Photos.h>
 #import <Photos/PHImageManager.h>
-#define VIDEO_FOLDER @"videoFolder"
+#import "GPUImage.h"
+#import "AlpVideoCameraDefine.h"
 
-#define UIColorFromRGB(rgbValue) [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0]
 
-#define SCREEN_WIDTH [UIScreen mainScreen].bounds.size.width
-#define SCREEN_HEIGHT [UIScreen mainScreen].bounds.size.height
-#define TIMER_INTERVAL 0.05
 typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     CameraManagerDevicePositionBack,
     CameraManagerDevicePositionFront,
@@ -35,16 +32,27 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
 
 @interface ALPVideoCameraView ()<TZImagePickerControllerDelegate>
 {
-    float preLayerWidth;//镜头宽
-    float preLayerHeight;//镜头高
-    float preLayerHWRate; //高，宽比
-    NSMutableArray* urlArray;
-    float totalTime; //视频总长度 默认10秒
-    float currentTime; //当前视频长度
-    float lastTime; //记录上次时间
-    UIView* progressPreView; //进度条
-    float progressStep; //进度条每次变长的最小单位
-    MBProgressHUD* HUD;
+    GPUImageVideoCamera *_videoCamera;
+    GPUImageOutput<GPUImageInput> *_filter;
+    GPUImageMovieWriter *_movieWriter;
+    NSString *_pathToMovie;
+    GPUImageView *_filteredVideoView;
+    CALayer *_focusLayer;
+    NSTimer *_myTimer;
+    UILabel *_timeLabel;
+    NSDate *_fromdate;
+    CGRect _mainScreenFrame;
+    
+    float _preLayerWidth;//镜头宽
+    float _preLayerHeight;//镜头高
+    float _preLayerHWRate; //高，宽比
+    NSMutableArray* _urlArray;
+    float _totalTime; //视频总长度 默认10秒
+    float _currentTime; //当前视频长度
+    float _lastTime; //记录上次时间
+    UIView* _progressPreView; //进度条
+    float _progressStep; //进度条每次变长的最小单位
+    MBProgressHUD* _HUD;
 }
 @property (nonatomic ,strong) UIButton *camerafilterChangeButton;
 @property (nonatomic ,strong) UIButton *cameraPositionChangeButton;
@@ -73,7 +81,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     //    [videoCamera removeAllTargets];
     //    filter = [[GPUImageBeautifyFilter alloc] init];
     //    [videoCamera addTarget:beautifyFilter];
-    //    [beautifyFilter addTarget:filteredVideoView];
+    //    [beautifyFilter addTarget:_filteredVideoView];
     
     return self;
 }
@@ -88,76 +96,76 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
 }
 
 - (void)setup {
-    if (totalTime==0) {
-        totalTime =10;
+    if (_totalTime==0) {
+        _totalTime =10;
         
     }
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notCloseCor) name:@"closeVideoCamerOne" object:nil];
     
-    lastTime = 0;
-    progressStep = SCREEN_WIDTH*TIMER_INTERVAL/totalTime;
-    preLayerWidth = SCREEN_WIDTH;
-    preLayerHeight = SCREEN_HEIGHT;
-    preLayerHWRate =preLayerHeight/preLayerWidth;
+    _lastTime = 0;
+    _progressStep = SCREEN_WIDTH*TIMER_INTERVAL/_totalTime;
+    _preLayerWidth = SCREEN_WIDTH;
+    _preLayerHeight = SCREEN_HEIGHT;
+    _preLayerHWRate =_preLayerHeight/_preLayerWidth;
     _lastAry = [[NSMutableArray alloc] init];
-    urlArray = [[NSMutableArray alloc]init];
+    _urlArray = [[NSMutableArray alloc]init];
     [self createVideoFolderIfNotExist];
-    mainScreenFrame = self.frame;
-    videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset1280x720 cameraPosition:AVCaptureDevicePositionBack];
-    if ([videoCamera.inputCamera lockForConfiguration:nil]) {
+    _mainScreenFrame = self.frame;
+    _videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset1280x720 cameraPosition:AVCaptureDevicePositionBack];
+    if ([_videoCamera.inputCamera lockForConfiguration:nil]) {
         //自动对焦
-        if ([videoCamera.inputCamera isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
-            [videoCamera.inputCamera setFocusMode:AVCaptureFocusModeContinuousAutoFocus];
+        if ([_videoCamera.inputCamera isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
+            [_videoCamera.inputCamera setFocusMode:AVCaptureFocusModeContinuousAutoFocus];
         }
         //自动曝光
-        if ([videoCamera.inputCamera isExposureModeSupported:AVCaptureExposureModeContinuousAutoExposure]) {
-            [videoCamera.inputCamera setExposureMode:AVCaptureExposureModeContinuousAutoExposure];
+        if ([_videoCamera.inputCamera isExposureModeSupported:AVCaptureExposureModeContinuousAutoExposure]) {
+            [_videoCamera.inputCamera setExposureMode:AVCaptureExposureModeContinuousAutoExposure];
         }
         //自动白平衡
-        if ([videoCamera.inputCamera isWhiteBalanceModeSupported:AVCaptureWhiteBalanceModeContinuousAutoWhiteBalance]) {
-            [videoCamera.inputCamera setWhiteBalanceMode:AVCaptureWhiteBalanceModeContinuousAutoWhiteBalance];
+        if ([_videoCamera.inputCamera isWhiteBalanceModeSupported:AVCaptureWhiteBalanceModeContinuousAutoWhiteBalance]) {
+            [_videoCamera.inputCamera setWhiteBalanceMode:AVCaptureWhiteBalanceModeContinuousAutoWhiteBalance];
         }
         
-        [videoCamera.inputCamera unlockForConfiguration];
+        [_videoCamera.inputCamera unlockForConfiguration];
     }
     
     _position = CameraManagerDevicePositionBack;
     //    videoCamera.frameRate = 10;
-    videoCamera.outputImageOrientation = UIInterfaceOrientationPortrait;
-    [videoCamera addAudioInputsAndOutputs];
-    videoCamera.horizontallyMirrorFrontFacingCamera = YES;
-    videoCamera.horizontallyMirrorRearFacingCamera = NO;
+    _videoCamera.outputImageOrientation = UIInterfaceOrientationPortrait;
+    [_videoCamera addAudioInputsAndOutputs];
+    _videoCamera.horizontallyMirrorFrontFacingCamera = YES;
+    _videoCamera.horizontallyMirrorRearFacingCamera = NO;
     
     
-    filter = [[LFGPUImageEmptyFilter alloc] init];
-    filteredVideoView = [[GPUImageView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    [videoCamera addTarget:filter];
-    [filter addTarget:filteredVideoView];
-    [videoCamera startCameraCapture];
+    _filter = [[LFGPUImageEmptyFilter alloc] init];
+    _filteredVideoView = [[GPUImageView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    [_videoCamera addTarget:_filter];
+    [_filter addTarget:_filteredVideoView];
+    [_videoCamera startCameraCapture];
     [self addSomeView];
     UITapGestureRecognizer *singleFingerOne = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(cameraViewTapAction:)];
     singleFingerOne.numberOfTouchesRequired = 1; //手指数
     singleFingerOne.numberOfTapsRequired = 1; //tap次数
-    [filteredVideoView addGestureRecognizer:singleFingerOne];
-    [self addSubview:filteredVideoView];
+    [_filteredVideoView addGestureRecognizer:singleFingerOne];
+    [self addSubview:_filteredVideoView];
 }
 - (void) addSomeView{
     //    253 91 73
-    timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(20.0, 27.0, 80, 26.0)];
-    timeLabel.font = [UIFont systemFontOfSize:13.0f];
-    timeLabel.text = @"录制 00:00";
-    timeLabel.textAlignment = NSTextAlignmentCenter;
-    timeLabel.backgroundColor = [UIColor colorWithRed:253/256.0 green:91/256.0 blue:73/256.0 alpha:1];
-    timeLabel.textColor = [UIColor whiteColor];
-    [filteredVideoView addSubview:timeLabel];
-    //    [[AppDelegate appDelegate].cmImageSize setLabelsRounded:timeLabel cornerRadiusValue:2 borderWidthValue:0 borderColorWidthValue:[UIColor clearColor]];
-    timeLabel.hidden = YES;
+    _timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(20.0, 27.0, 80, 26.0)];
+    _timeLabel.font = [UIFont systemFontOfSize:13.0f];
+    _timeLabel.text = @"录制 00:00";
+    _timeLabel.textAlignment = NSTextAlignmentCenter;
+    _timeLabel.backgroundColor = [UIColor colorWithRed:253/256.0 green:91/256.0 blue:73/256.0 alpha:1];
+    _timeLabel.textColor = [UIColor whiteColor];
+    [_filteredVideoView addSubview:_timeLabel];
+    //    [[AppDelegate appDelegate].cmImageSize setLabelsRounded:_timeLabel cornerRadiusValue:2 borderWidthValue:0 borderColorWidthValue:[UIColor clearColor]];
+    _timeLabel.hidden = YES;
     
     
     _btView = [[UIView alloc]initWithFrame:CGRectMake(SCREEN_WIDTH/2 - 36.5, SCREEN_HEIGHT - 125, 73, 73)];
     [_btView makeCornerRadius:36.5 borderColor:nil borderWidth:0];
     _btView.backgroundColor = [UIColor colorWithRed:(float)0xfe/256.0 green:(float)0x65/256.0 blue:(float)0x53/256.0 alpha:1];
-    [filteredVideoView addSubview:_btView];
+    [_filteredVideoView addSubview:_btView];
     
     _photoCaptureButton = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH/2 - 31.5, SCREEN_HEIGHT- 120, 63, 63)];
     _photoCaptureButton.backgroundColor = [UIColor colorWithRed:(float)0xfe/256.0 green:(float)0x65/256.0 blue:(float)0x53/256.0 alpha:1];
@@ -165,7 +173,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     [_photoCaptureButton addTarget:self action:@selector(startRecording:) forControlEvents:UIControlEventTouchUpInside];
     [_photoCaptureButton makeCornerRadius:31.5 borderColor:[UIColor blackColor] borderWidth:1.5];
     
-    [filteredVideoView addSubview:_photoCaptureButton];
+    [_filteredVideoView addSubview:_photoCaptureButton];
     
     
     _camerafilterChangeButton = [[UIButton alloc] init];
@@ -174,18 +182,18 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     [_camerafilterChangeButton setImage:img forState:UIControlStateNormal];
     [_camerafilterChangeButton setImage:[UIImage imageNamed:@"beautyON"] forState:UIControlStateSelected];
     [_camerafilterChangeButton addTarget:self action:@selector(changebeautifyFilterBtn:) forControlEvents:UIControlEventTouchUpInside];
-    [filteredVideoView addSubview:_camerafilterChangeButton];
+    [_filteredVideoView addSubview:_camerafilterChangeButton];
     
     UIButton* backBtn = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - 60, 25, 30, 30)];
     [backBtn setImage:[UIImage imageNamed:@"BackToHome"] forState:UIControlStateNormal];
     [backBtn addTarget:self action:@selector(clickBackToHome) forControlEvents:UIControlEventTouchUpInside];
-    [filteredVideoView addSubview:backBtn];
+    [_filteredVideoView addSubview:backBtn];
     
     _cameraPositionChangeButton = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - 110, 25, 30, 30)];
     UIImage* img2 = [UIImage imageNamed:@"cammera"];
     [_cameraPositionChangeButton setImage:img2 forState:UIControlStateNormal];
     [_cameraPositionChangeButton addTarget:self action:@selector(changeCameraPositionBtn:) forControlEvents:UIControlEventTouchUpInside];
-    [filteredVideoView addSubview:_cameraPositionChangeButton];
+    [_filteredVideoView addSubview:_cameraPositionChangeButton];
     
     _cameraChangeButton  = [[UIButton alloc] init];
     _cameraChangeButton.hidden = YES;
@@ -193,7 +201,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     UIImage* img3 = [UIImage imageNamed:@"complete"];
     [_cameraChangeButton setImage:img3 forState:UIControlStateNormal];
     [_cameraChangeButton addTarget:self action:@selector(stopRecording:) forControlEvents:UIControlEventTouchUpInside];
-    [filteredVideoView addSubview:_cameraChangeButton];
+    [_filteredVideoView addSubview:_cameraChangeButton];
     
     _dleButton = [[UIButton alloc] init];
     _dleButton.hidden = YES;
@@ -201,7 +209,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     UIImage* img4 = [UIImage imageNamed:@"del"];
     [_dleButton setImage:img4 forState:UIControlStateNormal];
     [_dleButton addTarget:self action:@selector(clickDleBtn:) forControlEvents:UIControlEventTouchUpInside];
-    [filteredVideoView addSubview:_dleButton];
+    [_filteredVideoView addSubview:_dleButton];
     
     _inputLocalVieoBtn = [[UIButton alloc] init];
     //    _inputLocalVieoBtn.hidden = YES;
@@ -209,13 +217,13 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     UIImage* img5 = [UIImage imageNamed:@"record_ico_input_1"];
     [_inputLocalVieoBtn setImage:img5 forState:UIControlStateNormal];
     [_inputLocalVieoBtn addTarget:self action:@selector(clickInputBtn:) forControlEvents:UIControlEventTouchUpInside];
-    [filteredVideoView addSubview:_inputLocalVieoBtn];
+    [_filteredVideoView addSubview:_inputLocalVieoBtn];
     
     
-    progressPreView = [[UIView alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT -4 , 0, 4)];
-    progressPreView.backgroundColor = UIColorFromRGB(0xffc738);
-    [progressPreView makeCornerRadius:2 borderColor:nil borderWidth:0];
-    [filteredVideoView addSubview:progressPreView];
+    _progressPreView = [[UIView alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT -4 , 0, 4)];
+    _progressPreView.backgroundColor = UIColorFromRGB(0xffc738);
+    [_progressPreView makeCornerRadius:2 borderColor:nil borderWidth:0];
+    [_filteredVideoView addSubview:_progressPreView];
     
     
 }
@@ -225,29 +233,29 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     _inputLocalVieoBtn.hidden = YES;
     if (!sender.selected) {
         
-        lastTime = currentTime;
-        [_lastAry addObject:[NSString stringWithFormat:@"%f",lastTime]];
+        _lastTime = _currentTime;
+        [_lastAry addObject:[NSString stringWithFormat:@"%f",_lastTime]];
         _camerafilterChangeButton.hidden = YES;
         _cameraPositionChangeButton.hidden = YES;
-        timeLabel.hidden = NO;
+        _timeLabel.hidden = NO;
         _dleButton.hidden = YES;
         
         sender.selected = YES;
-        pathToMovie = [NSHomeDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"tmp/Movie%lu.mov",(unsigned long)urlArray.count]];
-        unlink([pathToMovie UTF8String]); // If a file already exists, AVAssetWriter won't let you record new frames, so delete the old movie
-        NSURL *movieURL = [NSURL fileURLWithPath:pathToMovie];
-        movieWriter = [[GPUImageMovieWriter alloc] initWithMovieURL:movieURL size:CGSizeMake(720.0, 1280.0)];
-        movieWriter.isNeedBreakAudioWhiter = YES;
-        movieWriter.encodingLiveVideo = YES;
-        movieWriter.shouldPassthroughAudio = YES;
-        [filter addTarget:movieWriter];
-        videoCamera.audioEncodingTarget = movieWriter;
-        [movieWriter startRecording];
+        _pathToMovie = [NSHomeDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"tmp/Movie%lu.mov",(unsigned long)_urlArray.count]];
+        unlink([_pathToMovie UTF8String]); // If a file already exists, AVAssetWriter won't let you record new frames, so delete the old movie
+        NSURL *movieURL = [NSURL fileURLWithPath:_pathToMovie];
+        _movieWriter = [[GPUImageMovieWriter alloc] initWithMovieURL:movieURL size:CGSizeMake(720.0, 1280.0)];
+        _movieWriter.isNeedBreakAudioWhiter = YES;
+        _movieWriter.encodingLiveVideo = YES;
+        _movieWriter.shouldPassthroughAudio = YES;
+        [_filter addTarget:_movieWriter];
+        _videoCamera.audioEncodingTarget = _movieWriter;
+        [_movieWriter startRecording];
         _isRecoding = YES;
         _photoCaptureButton.backgroundColor = [UIColor colorWithRed:(float)0xfd/256.0 green:(float)0xd8/256.0 blue:(float)0x54/256.0 alpha:1];
         _btView.backgroundColor = [UIColor colorWithRed:(float)0xfd/256.0 green:(float)0xd8/256.0 blue:(float)0x54/256.0 alpha:1];
-        fromdate = [NSDate date];
-        myTimer = [NSTimer scheduledTimerWithTimeInterval:TIMER_INTERVAL
+        _fromdate = [NSDate date];
+        _myTimer = [NSTimer scheduledTimerWithTimeInterval:TIMER_INTERVAL
                                                    target:self
                                                  selector:@selector(updateTimer:)
                                                  userInfo:nil
@@ -259,23 +267,23 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
         _camerafilterChangeButton.hidden = NO;
         _cameraPositionChangeButton.hidden = NO;
         sender.selected = NO;
-        videoCamera.audioEncodingTarget = nil;
-        NSLog(@"Path %@",pathToMovie);
-        if (pathToMovie == nil) {
+        _videoCamera.audioEncodingTarget = nil;
+        NSLog(@"Path %@",_pathToMovie);
+        if (_pathToMovie == nil) {
             return;
         }
         _btView.backgroundColor = [UIColor colorWithRed:(float)0xfe/256.0 green:(float)0x65/256.0 blue:(float)0x53/256.0 alpha:1];
         _photoCaptureButton.backgroundColor = [UIColor colorWithRed:(float)0xfe/256.0 green:(float)0x65/256.0 blue:(float)0x53/256.0 alpha:1];
-        //        UISaveVideoAtPathToSavedPhotosAlbum(pathToMovie, nil, nil, nil);
+        //        UISaveVideoAtPathToSavedPhotosAlbum(_pathToMovie, nil, nil, nil);
         if (_isRecoding) {
-            [movieWriter finishRecording];
-            [filter removeTarget:movieWriter];
-            [urlArray addObject:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@",pathToMovie]]];
+            [_movieWriter finishRecording];
+            [_filter removeTarget:_movieWriter];
+            [_urlArray addObject:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@",_pathToMovie]]];
             _isRecoding = NO;
         }
-        [myTimer invalidate];
-        myTimer = nil;
-        if (urlArray.count) {
+        [_myTimer invalidate];
+        _myTimer = nil;
+        if (_urlArray.count) {
             _dleButton.hidden = NO;
         }
     }
@@ -284,38 +292,38 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
 }
 
 - (IBAction)stopRecording:(id)sender {
-    videoCamera.audioEncodingTarget = nil;
-    NSLog(@"Path %@",pathToMovie);
-    if (pathToMovie == nil) {
+    _videoCamera.audioEncodingTarget = nil;
+    NSLog(@"Path %@",_pathToMovie);
+    if (_pathToMovie == nil) {
         return;
     }
-    //    UISaveVideoAtPathToSavedPhotosAlbum(pathToMovie, nil, nil, nil);
+    //    UISaveVideoAtPathToSavedPhotosAlbum(_pathToMovie, nil, nil, nil);
     if (_isRecoding) {
-        [movieWriter finishRecording];
-        [filter removeTarget:movieWriter];
+        [_movieWriter finishRecording];
+        [_filter removeTarget:_movieWriter];
         _isRecoding = NO;
     }
     
-    timeLabel.text = @"录制 00:00";
-    [myTimer invalidate];
-    myTimer = nil;
-    HUD = [MBProgressHUD showHUDAddedTo:self animated:YES];
-    HUD.label.text = @"视频生成中...";
+    _timeLabel.text = @"录制 00:00";
+    [_myTimer invalidate];
+    _myTimer = nil;
+    _HUD = [MBProgressHUD showHUDAddedTo:self animated:YES];
+    _HUD.label.text = @"视频生成中...";
     if (_photoCaptureButton.selected) {
-        [urlArray addObject:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@",pathToMovie]]];
+        [_urlArray addObject:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@",_pathToMovie]]];
     }
     
-    //    [urlArray addObject:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@",pathToMovie]]];
-    //    [self mergeAndExportVideosAtFileURLs:urlArray];
+    //    [_urlArray addObject:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@",_pathToMovie]]];
+    //    [self mergeAndExportVideosAtFileURLs:_urlArray];
     NSString *path = [self getVideoMergeFilePathString];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self mergeAndExportVideos:urlArray withOutPath:path];
-        [urlArray removeAllObjects];
+        [self mergeAndExportVideos:_urlArray withOutPath:path];
+        [_urlArray removeAllObjects];
         [_lastAry removeAllObjects];
-        currentTime = 0;
-        lastTime = 0;
+        _currentTime = 0;
+        _lastTime = 0;
         _dleButton.hidden = YES;
-        [progressPreView setFrame:CGRectMake(0, SCREEN_HEIGHT - 4, 0, 4)];
+        [_progressPreView setFrame:CGRectMake(0, SCREEN_HEIGHT - 4, 0, 4)];
         _btView.backgroundColor = [UIColor colorWithRed:250/256.0 green:211/256.0 blue:75/256.0 alpha:1];
         _photoCaptureButton.backgroundColor = [UIColor colorWithRed:250/256.0 green:211/256.0 blue:75/256.0 alpha:1];
         _photoCaptureButton.selected = NO;
@@ -331,20 +339,20 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     //    http://www.jianshu.com/p/0f9789a6d99a 视频与音乐合成
     
     
-    //[movieWriter cancelRecording];
+    //[_movieWriter cancelRecording];
 }
 -(void)clickDleBtn:(UIButton*)sender {
     float progressWidth = [_lastAry.lastObject floatValue]/10*SCREEN_WIDTH;
-    [progressPreView setFrame:CGRectMake(0, SCREEN_HEIGHT - 4, progressWidth, 4)];
-    currentTime = [_lastAry.lastObject floatValue];
-    timeLabel.text = [NSString stringWithFormat:@"录制 00:0%.0f",currentTime];
-    if (urlArray.count) {
-        [urlArray removeLastObject];
+    [_progressPreView setFrame:CGRectMake(0, SCREEN_HEIGHT - 4, progressWidth, 4)];
+    _currentTime = [_lastAry.lastObject floatValue];
+    _timeLabel.text = [NSString stringWithFormat:@"录制 00:0%.0f",_currentTime];
+    if (_urlArray.count) {
+        [_urlArray removeLastObject];
         [_lastAry removeLastObject];
-        if (urlArray.count == 0) {
+        if (_urlArray.count == 0) {
             _dleButton.hidden = YES;
         }
-        if (currentTime < 3) {
+        if (_currentTime < 3) {
             _cameraChangeButton.hidden = YES;
         }
     }
@@ -359,8 +367,8 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     imagePickerVc.allowPickingVideo = YES;
     imagePickerVc.sortAscendingByModificationDate = YES;
     [imagePickerVc setDidFinishPickingVideoHandle:^(UIImage *coverImage,id asset) {
-        HUD = [MBProgressHUD showHUDAddedTo:self animated:YES];
-        HUD.label.text = @"视频导出中...";
+        _HUD = [MBProgressHUD showHUDAddedTo:self animated:YES];
+        _HUD.label.text = @"视频导出中...";
         if ([UIDevice currentDevice].systemVersion.floatValue >= 8.0f) {
             PHAsset* myasset = asset;
             PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
@@ -378,15 +386,15 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
                     NSURL *url = urlAsset.URL;
                     NSData* videoData = [NSData dataWithContentsOfFile:[[url absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
                     if (videoData.length>1024*1024*4.5) {
-                        HUD.label.text = @"所选视频大于5M,请重新选择";
-                        [HUD hide:YES afterDelay:1.5];
+                        _HUD.label.text = @"所选视频大于5M,请重新选择";
+                        [_HUD hide:YES afterDelay:1.5];
                     }else
                     {
                         AlpEditingPublishingViewController* cor = [[AlpEditingPublishingViewController alloc] init];
                         cor.videoURL = url;
                         
                         [[NSNotificationCenter defaultCenter] removeObserver:self];
-                        [videoCamera stopCameraCapture];
+                        [_videoCamera stopCameraCapture];
                         //                     [[AppDelegate appDelegate] pushViewController:cor animated:YES];
                         if (self.delegate&&[self.delegate respondsToSelector:@selector(videoCamerView:pushViewCotroller:)]) {
                             [self.delegate videoCamerView:self pushViewCotroller:cor];
@@ -405,15 +413,15 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
                 NSURL *url = videoURL;
                 NSData* videoData = [NSData dataWithContentsOfFile:[[url absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
                 if (videoData.length>1024*1024*4.5) {
-                    HUD.label.text = @"所选视频大于5M,请重新选择";
-                    [HUD hide:YES afterDelay:1.5];
+                    _HUD.label.text = @"所选视频大于5M,请重新选择";
+                    [_HUD hide:YES afterDelay:1.5];
                 }else
                 {
                     AlpEditingPublishingViewController* cor = [[AlpEditingPublishingViewController alloc] init];
                     cor.videoURL = url;
                     
                     [[NSNotificationCenter defaultCenter] removeObserver:self];
-                    [videoCamera stopCameraCapture];
+                    [_videoCamera stopCameraCapture];
                     //                    [[AppDelegate appDelegate] pushViewController:cor animated:YES];
                     if (self.delegate&&[self.delegate respondsToSelector:@selector(videoCamerView:pushViewCotroller:)]) {
                         [self.delegate videoCamerView:self pushViewCotroller:cor];
@@ -533,7 +541,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     [exporter exportAsynchronouslyWithCompletionHandler:^{
         dispatch_async(dispatch_get_main_queue(), ^{
             
-            [videoCamera stopCameraCapture];
+            [_videoCamera stopCameraCapture];
             
             AlpEditVideoViewController* vc = [[AlpEditVideoViewController alloc]init];
             vc.width = weakSelf.width;
@@ -721,14 +729,14 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
 {
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [videoCamera stopCameraCapture];
+    [_videoCamera stopCameraCapture];
     if (_isRecoding) {
-        [movieWriter cancelRecording];
-        [filter removeTarget:movieWriter];
+        [_movieWriter cancelRecording];
+        [_filter removeTarget:_movieWriter];
         _isRecoding = NO;
     }
-    [myTimer invalidate];
-    myTimer = nil;
+    [_myTimer invalidate];
+    _myTimer = nil;
     if (self.backToHomeBlock) {
         NSLog(@"clickBacktoHome");
         self.backToHomeBlock();
@@ -745,20 +753,20 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     
     switch (_position) {
         case CameraManagerDevicePositionBack: {
-            if (videoCamera.cameraPosition == AVCaptureDevicePositionBack) {
-                [videoCamera pauseCameraCapture];
+            if (_videoCamera.cameraPosition == AVCaptureDevicePositionBack) {
+                [_videoCamera pauseCameraCapture];
                 _position = CameraManagerDevicePositionFront;
                 //                dispatch_async(dispatch_get_global_queue(0, 0), ^{
-                [videoCamera rotateCamera];
-                [videoCamera resumeCameraCapture];
+                [_videoCamera rotateCamera];
+                [_videoCamera resumeCameraCapture];
                 
                 sender.selected = YES;
-                [videoCamera removeAllTargets];
+                [_videoCamera removeAllTargets];
                 //        filter = [[GPUImageBeautifyFilter alloc] init];
                 _camerafilterChangeButton.selected = YES;
-                filter = [[GPUImageBeautifyFilter alloc] init];
-                [videoCamera addTarget:filter];
-                [filter addTarget:filteredVideoView];
+                _filter = [[GPUImageBeautifyFilter alloc] init];
+                [_videoCamera addTarget:_filter];
+                [_filter addTarget:_filteredVideoView];
                 
                 
                 //                });
@@ -766,20 +774,20 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
         }
             break;
         case CameraManagerDevicePositionFront: {
-            if (videoCamera.cameraPosition == AVCaptureDevicePositionFront) {
-                [videoCamera pauseCameraCapture];
+            if (_videoCamera.cameraPosition == AVCaptureDevicePositionFront) {
+                [_videoCamera pauseCameraCapture];
                 _position = CameraManagerDevicePositionBack;
                 
                 //                dispatch_async(dispatch_get_global_queue(0, 0), ^{
-                [videoCamera rotateCamera];
-                [videoCamera resumeCameraCapture];
+                [_videoCamera rotateCamera];
+                [_videoCamera resumeCameraCapture];
                 
                 sender.selected = NO;
-                [videoCamera removeAllTargets];
+                [_videoCamera removeAllTargets];
                 _camerafilterChangeButton.selected = NO;
-                filter = [[LFGPUImageEmptyFilter alloc] init];
-                [videoCamera addTarget:filter];
-                [filter addTarget:filteredVideoView];
+                _filter = [[LFGPUImageEmptyFilter alloc] init];
+                [_videoCamera addTarget:_filter];
+                [_filter addTarget:_filteredVideoView];
                 //                });
             }
         }
@@ -788,9 +796,9 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
             break;
     }
     
-    if ([videoCamera.inputCamera lockForConfiguration:nil] && [videoCamera.inputCamera isExposureModeSupported:AVCaptureExposureModeContinuousAutoExposure]) {
-        [videoCamera.inputCamera setExposureMode:AVCaptureExposureModeContinuousAutoExposure];
-        [videoCamera.inputCamera unlockForConfiguration];
+    if ([_videoCamera.inputCamera lockForConfiguration:nil] && [_videoCamera.inputCamera isExposureModeSupported:AVCaptureExposureModeContinuousAutoExposure]) {
+        [_videoCamera.inputCamera setExposureMode:AVCaptureExposureModeContinuousAutoExposure];
+        [_videoCamera.inputCamera unlockForConfiguration];
     }
     
     
@@ -800,20 +808,20 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     if (!sender.selected) {
         
         sender.selected = YES;
-        [videoCamera removeAllTargets];
+        [_videoCamera removeAllTargets];
         //        filter = [[GPUImageBeautifyFilter alloc] init];
-        filter = [[GPUImageBeautifyFilter alloc] init];
-        [videoCamera addTarget:filter];
-        [filter addTarget:filteredVideoView];
+        _filter = [[GPUImageBeautifyFilter alloc] init];
+        [_videoCamera addTarget:_filter];
+        [_filter addTarget:_filteredVideoView];
         
         
     }else
     {
         sender.selected = NO;
-        [videoCamera removeAllTargets];
-        filter = [[LFGPUImageEmptyFilter alloc] init];
-        [videoCamera addTarget:filter];
-        [filter addTarget:filteredVideoView];
+        [_videoCamera removeAllTargets];
+        _filter = [[LFGPUImageEmptyFilter alloc] init];
+        [_videoCamera addTarget:_filter];
+        [_filter addTarget:_filteredVideoView];
     }
 }
 
@@ -825,34 +833,34 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     //    NSCalendar *calendar = [NSCalendar currentCalendar];
     //    NSInteger unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit |
     //    NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit;
-    //    NSDateComponents *comps  = [calendar components:unitFlags fromDate:fromdate toDate:todate options:NSCalendarWrapComponents];
+    //    NSDateComponents *comps  = [calendar components:unitFlags _fromdate:_fromdate toDate:todate options:NSCalendarWrapComponents];
     //    //NSInteger hour = [comps hour];
     //    //NSInteger min = [comps minute];
     //    //NSInteger sec = [comps second];
     //    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
     //    NSDate *timer = [gregorian dateFromComponents:comps];
-    //    NSString *date = [dateFormator stringFromDate:timer];
+    //    NSString *date = [dateFormator string_fromdate:timer];
     
     
-    currentTime += TIMER_INTERVAL;
+    _currentTime += TIMER_INTERVAL;
     
     
-    //    timeLabel.text = [NSString stringWithFormat:@"录制 00:02%d",(int)currentTime];
-    if (currentTime>=10) {
-        timeLabel.text = [NSString stringWithFormat:@"录制 00:%d",(int)currentTime];
+    //    _timeLabel.text = [NSString stringWithFormat:@"录制 00:02%d",(int)_currentTime];
+    if (_currentTime>=10) {
+        _timeLabel.text = [NSString stringWithFormat:@"录制 00:%d",(int)_currentTime];
     }else
     {
-        timeLabel.text = [NSString stringWithFormat:@"录制 00:0%.0f",currentTime];
+        _timeLabel.text = [NSString stringWithFormat:@"录制 00:0%.0f",_currentTime];
     }
     
-    float progressWidth = progressPreView.frame.size.width+progressStep;
-    [progressPreView setFrame:CGRectMake(0, SCREEN_HEIGHT - 4, progressWidth, 4)];
-    if (currentTime>3) {
+    float progressWidth = _progressPreView.frame.size.width+_progressStep;
+    [_progressPreView setFrame:CGRectMake(0, SCREEN_HEIGHT - 4, progressWidth, 4)];
+    if (_currentTime>3) {
         _cameraChangeButton.hidden = NO;
     }
     
     //时间到了停止录制视频
-    if (currentTime>=totalTime) {
+    if (_currentTime>=_totalTime) {
         
         _photoCaptureButton.enabled = NO;
         
@@ -866,7 +874,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     imageView.image = focusImage;
     CALayer *layer = imageView.layer;
     layer.hidden = YES;
-    [filteredVideoView.layer addSublayer:layer];
+    [_filteredVideoView.layer addSublayer:layer];
     _focusLayer = layer;
     
 }
@@ -900,7 +908,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
 
 
 - (void)focusLayerNormal {
-    filteredVideoView.userInteractionEnabled = YES;
+    _filteredVideoView.userInteractionEnabled = YES;
     _focusLayer.hidden = YES;
 }
 
@@ -910,7 +918,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
 - (CGPoint)convertToPointOfInterestFromViewCoordinates:(CGPoint)viewCoordinates
 {
     CGPoint pointOfInterest = CGPointMake(.5f, .5f);
-    CGSize frameSize = filteredVideoView.frame.size;
+    CGSize frameSize = _filteredVideoView.frame.size;
     CGSize apertureSize = CGSizeMake(1280, 720);//设备采集分辨率
     CGPoint point = viewCoordinates;
     CGFloat apertureRatio = apertureSize.height / apertureSize.width;
@@ -945,13 +953,13 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
 -(void)cameraViewTapAction:(UITapGestureRecognizer *)tgr
 {
     if (tgr.state == UIGestureRecognizerStateRecognized && (_focusLayer == nil || _focusLayer.hidden)) {
-        CGPoint location = [tgr locationInView:filteredVideoView];
+        CGPoint location = [tgr locationInView:_filteredVideoView];
         [self setfocusImage];
         [self layerAnimationWithPoint:location];
-        AVCaptureDevice *device = videoCamera.inputCamera;
+        AVCaptureDevice *device = _videoCamera.inputCamera;
         //        CGPoint pointOfInterest = CGPointMake(0.5f, 0.5f);
         //        NSLog(@"taplocation x = %f y = %f", location.x, location.y);
-        //        CGSize frameSize = [filteredVideoView frame].size;
+        //        CGSize frameSize = [_filteredVideoView frame].size;
         //
         //        if ([videoCamera cameraPosition] == AVCaptureDevicePositionFront) {
         //            location.x = frameSize.width - location.x;

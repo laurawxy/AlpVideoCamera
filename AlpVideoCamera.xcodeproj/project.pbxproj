@@ -816,6 +816,7 @@
 		D09D2C7F2148E5550097B0EF /* icon_weixin_selected@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_weixin_selected@3x.png"; sourceTree = "<group>"; };
 		D09D2C802148E5550097B0EF /* icon_weixin_pyq@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_weixin_pyq@2x.png"; sourceTree = "<group>"; };
 		D09D2C8A2148E5ED0097B0EF /* icon_weixin_pyq_selected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_weixin_pyq_selected@2x.png"; sourceTree = "<group>"; };
+		D201FD70214D4A1B00FC5A5E /* AlpVideoCameraDefine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlpVideoCameraDefine.h; sourceTree = "<group>"; };
 		D213E8A021496251002B8E63 /* AlpVideoCameraViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlpVideoCameraViewController.h; sourceTree = "<group>"; };
 		D213E8A121496251002B8E63 /* AlpVideoCameraViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AlpVideoCameraViewController.m; sourceTree = "<group>"; };
 		D213E8A321496B7E002B8E63 /* ALPVideoCameraView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ALPVideoCameraView.h; sourceTree = "<group>"; };
@@ -1282,6 +1283,7 @@
 				D09D2A952148CB370097B0EF /* SDAVAssetExportSession.h */,
 				D07D1AC3214A586A00162D30 /* AlpEditingPublishingViewController.h */,
 				D07D1AC4214A586A00162D30 /* AlpEditingPublishingViewController.m */,
+				D201FD70214D4A1B00FC5A5E /* AlpVideoCameraDefine.h */,
 				D09D29FE2148CB370097B0EF /* music */,
 				D09D2A3E2148CB370097B0EF /* stickers */,
 				D09D2A6C2148CB370097B0EF /* filterImage */,

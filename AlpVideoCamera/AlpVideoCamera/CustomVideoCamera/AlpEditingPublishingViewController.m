@@ -12,17 +12,7 @@
 #import "masonry.h"
 #import <AVFoundation/AVFoundation.h>
 #import "RTRootNavigationController.h"
-
-#define SCREEN_LayoutScaleBaseOnIPHEN6(x) (([UIScreen mainScreen].bounds.size.width)/375.00 * x)
-#define kSignatureContextLengths 20
-
-#define COLOR_FONT_LIGHTGRAY 0x999999
-#define COLOR_LINEVIEW_DARKGRAY  0x666666
-#define COLOR_BACKBG_DARKGRAY 0x666666
-#define COLOR_FONT_YELLOW 0xFDD854
-#define COLOR_FONT_WHITE 0xFFFFFF
-
-#define RGB16(rgbValue) [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0]
+#import "AlpVideoCameraDefine.h"
 
 @interface AlpEditingPublishingViewController () <UITextViewDelegate, CLLocationManagerDelegate>
 {
@@ -159,7 +149,7 @@
     UIButton* backBtn = [UIButton new];
     backBtn.titleLabel.font = [UIFont systemFontOfSize:SCREEN_LayoutScaleBaseOnIPHEN6(18.0)];
     [backBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    backBtn.backgroundColor = RGB16(COLOR_FONT_YELLOW);
+    backBtn.backgroundColor = UIColorFromRGB(COLOR_FONT_YELLOW);
     [backBtn setTitle:@"发布" forState:UIControlStateNormal];
     [backBtn addTarget:self action:@selector(publishingDynamic:) forControlEvents:UIControlEventTouchUpInside];
     [bottomBarView addSubview:backBtn];
@@ -175,7 +165,7 @@
     
     UILabel* leftWXLabel = [UILabel new];
     leftWXLabel.font = [UIFont systemFontOfSize:SCREEN_LayoutScaleBaseOnIPHEN6(12.0)];
-    leftWXLabel.textColor = RGB16(COLOR_FONT_LIGHTGRAY);
+    leftWXLabel.textColor = UIColorFromRGB(COLOR_FONT_LIGHTGRAY);
     leftWXLabel.text = @"朋友圈";
     [bottomBarView addSubview:leftWXLabel];
     [leftWXLabel mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -185,7 +175,7 @@
     
     UILabel* rightWXLabel = [UILabel new];
     rightWXLabel.font = [UIFont systemFontOfSize:SCREEN_LayoutScaleBaseOnIPHEN6(12.0)];
-    rightWXLabel.textColor = RGB16(COLOR_FONT_LIGHTGRAY);
+    rightWXLabel.textColor = UIColorFromRGB(COLOR_FONT_LIGHTGRAY);
     rightWXLabel.text = @"微信好友";
     [bottomBarView addSubview:rightWXLabel];
     [rightWXLabel mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -226,7 +216,7 @@
     }];
     
     UIView* leftLineView = [UIView new];
-    leftLineView.backgroundColor = RGB16(COLOR_LINEVIEW_DARKGRAY);
+    leftLineView.backgroundColor = UIColorFromRGB(COLOR_LINEVIEW_DARKGRAY);
     [bottomBarView addSubview:leftLineView];
     [leftLineView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(bottomBarView).offset(SCREEN_LayoutScaleBaseOnIPHEN6(40.0));
@@ -235,7 +225,7 @@
         make.centerY.equalTo(shareTipLabel);
     }];
     UIView* rightLineView = [UIView new];
-    rightLineView.backgroundColor = RGB16(COLOR_LINEVIEW_DARKGRAY);
+    rightLineView.backgroundColor = UIColorFromRGB(COLOR_LINEVIEW_DARKGRAY);
     [bottomBarView addSubview:rightLineView];
     [rightLineView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.right.equalTo(bottomBarView).offset(-SCREEN_LayoutScaleBaseOnIPHEN6(40.0));

@@ -17,10 +17,7 @@
 #import "LFGPUImageEmptyFilter.h"
 #import "AlpEditingPublishingViewController.h"
 #import "RTRootNavigationController.h"
-
-#define SCREEN_WIDTH [UIScreen mainScreen].bounds.size.width
-#define SCREEN_HEIGHT [UIScreen mainScreen].bounds.size.height
-#define SCREEN_LayoutScaleBaseOnIPHEN6(x) (([UIScreen mainScreen].bounds.size.width)/375.00 * x)
+#import "AlpVideoCameraDefine.h"
 
 @interface MusicData : NSObject
 
