@@ -281,7 +281,6 @@
 		D09D2B592148CB380097B0EF /* GPUImageMissEtikateFilter.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A782148CB370097B0EF /* GPUImageMissEtikateFilter.png */; };
 		D09D2B5A2148CB380097B0EF /* GPUImageSaturationFilter0.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A792148CB370097B0EF /* GPUImageSaturationFilter0.png */; };
 		D09D2B5B2148CB380097B0EF /* lookup_miss_etikate.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A7A2148CB370097B0EF /* lookup_miss_etikate.png */; };
-		D09D2B5C2148CB380097B0EF /* LDWatermark.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A7C2148CB370097B0EF /* LDWatermark.png */; };
 		D09D2B5D2148CB380097B0EF /* cammera@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A7D2148CB370097B0EF /* cammera@2x.png */; };
 		D09D2B5E2148CB380097B0EF /* BackToHome@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A7E2148CB370097B0EF /* BackToHome@2x.png */; };
 		D09D2B5F2148CB380097B0EF /* music.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A7F2148CB370097B0EF /* music.png */; };
@@ -315,6 +314,7 @@
 		D09D2C882148E5550097B0EF /* icon_weixin_selected@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2C7F2148E5550097B0EF /* icon_weixin_selected@3x.png */; };
 		D09D2C892148E5550097B0EF /* icon_weixin_pyq@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2C802148E5550097B0EF /* icon_weixin_pyq@2x.png */; };
 		D09D2C8B2148E5EE0097B0EF /* icon_weixin_pyq_selected@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2C8A2148E5ED0097B0EF /* icon_weixin_pyq_selected@2x.png */; };
+		D201FD74214D528B00FC5A5E /* LDWatermark.png in Resources */ = {isa = PBXBuildFile; fileRef = D201FD73214D528B00FC5A5E /* LDWatermark.png */; };
 		D213E8A221496251002B8E63 /* AlpVideoCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D213E8A121496251002B8E63 /* AlpVideoCameraViewController.m */; };
 		D213E8A521496B7E002B8E63 /* ALPVideoCameraView.m in Sources */ = {isa = PBXBuildFile; fileRef = D213E8A421496B7E002B8E63 /* ALPVideoCameraView.m */; };
 		FEBFDF1ED94F17084C32D2E9 /* libPods-AlpVideoCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CADB371C0B6A5A9FB848C148 /* libPods-AlpVideoCamera.a */; };
@@ -779,7 +779,6 @@
 		D09D2A782148CB370097B0EF /* GPUImageMissEtikateFilter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GPUImageMissEtikateFilter.png; sourceTree = "<group>"; };
 		D09D2A792148CB370097B0EF /* GPUImageSaturationFilter0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GPUImageSaturationFilter0.png; sourceTree = "<group>"; };
 		D09D2A7A2148CB370097B0EF /* lookup_miss_etikate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = lookup_miss_etikate.png; sourceTree = "<group>"; };
-		D09D2A7C2148CB370097B0EF /* LDWatermark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LDWatermark.png; sourceTree = "<group>"; };
 		D09D2A7D2148CB370097B0EF /* cammera@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "cammera@2x.png"; sourceTree = "<group>"; };
 		D09D2A7E2148CB370097B0EF /* BackToHome@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "BackToHome@2x.png"; sourceTree = "<group>"; };
 		D09D2A7F2148CB370097B0EF /* music.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = music.png; sourceTree = "<group>"; };
@@ -817,6 +816,7 @@
 		D09D2C802148E5550097B0EF /* icon_weixin_pyq@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_weixin_pyq@2x.png"; sourceTree = "<group>"; };
 		D09D2C8A2148E5ED0097B0EF /* icon_weixin_pyq_selected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_weixin_pyq_selected@2x.png"; sourceTree = "<group>"; };
 		D201FD70214D4A1B00FC5A5E /* AlpVideoCameraDefine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlpVideoCameraDefine.h; sourceTree = "<group>"; };
+		D201FD73214D528B00FC5A5E /* LDWatermark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LDWatermark.png; sourceTree = "<group>"; };
 		D213E8A021496251002B8E63 /* AlpVideoCameraViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlpVideoCameraViewController.h; sourceTree = "<group>"; };
 		D213E8A121496251002B8E63 /* AlpVideoCameraViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AlpVideoCameraViewController.m; sourceTree = "<group>"; };
 		D213E8A321496B7E002B8E63 /* ALPVideoCameraView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ALPVideoCameraView.h; sourceTree = "<group>"; };
@@ -1569,6 +1569,7 @@
 		D09D2A7B2148CB370097B0EF /* cammerImg */ = {
 			isa = PBXGroup;
 			children = (
+				D201FD73214D528B00FC5A5E /* LDWatermark.png */,
 				D09D2C8A2148E5ED0097B0EF /* icon_weixin_pyq_selected@2x.png */,
 				D09D2C792148E5540097B0EF /* GiftCheckmarkIcon@2x.png */,
 				D09D2C7D2148E5550097B0EF /* icon_weixin_pyq_selected@3x.png */,
@@ -1578,7 +1579,6 @@
 				D09D2C7F2148E5550097B0EF /* icon_weixin_selected@3x.png */,
 				D09D2C7E2148E5550097B0EF /* icon_weixin@2x.png */,
 				D09D2C782148E5540097B0EF /* icon_weixin@3x.png */,
-				D09D2A7C2148CB370097B0EF /* LDWatermark.png */,
 				D09D2A7D2148CB370097B0EF /* cammera@2x.png */,
 				D09D2A7E2148CB370097B0EF /* BackToHome@2x.png */,
 				D09D2A7F2148CB370097B0EF /* music.png */,
@@ -1692,6 +1692,7 @@
 				D09D2B172148CB370097B0EF /* icon545.png in Resources */,
 				D09D2C812148E5550097B0EF /* icon_weixin@3x.png in Resources */,
 				D09D2AFB2148CB370097B0EF /* music1.json in Resources */,
+				D201FD74214D528B00FC5A5E /* LDWatermark.png in Resources */,
 				D09D2B682148CB380097B0EF /* del@3x.png in Resources */,
 				D09D2C872148E5550097B0EF /* icon_weixin@2x.png in Resources */,
 				D09D2B162148CB370097B0EF /* audio545.mp3 in Resources */,
@@ -1785,7 +1786,6 @@
 				D09D2B152148CB370097B0EF /* icon540.png in Resources */,
 				D09D2B422148CB380097B0EF /* stickers546.jpg in Resources */,
 				D09D2B0F2148CB370097B0EF /* audio532.mp3 in Resources */,
-				D09D2B5C2148CB380097B0EF /* LDWatermark.png in Resources */,
 				D09D2B462148CB380097B0EF /* stickers543.jpg in Resources */,
 				D09D2B372148CB380097B0EF /* stickers535.jpg in Resources */,
 				D09D2B102148CB370097B0EF /* icon535.png in Resources */,
