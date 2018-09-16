@@ -13,6 +13,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import "RTRootNavigationController.h"
 #import "AlpVideoCameraDefine.h"
+#import "UIImage+AlpExtensions.h"
 
 @interface AlpEditingPublishingViewController () <UITextViewDelegate, CLLocationManagerDelegate>
 {
@@ -38,7 +39,7 @@
     
     self.navigationController.navigationBarHidden = YES;
     //    _videoCoverImg = [[AppDelegate appDelegate].cmImageSize getImage:[[_videoURL absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
-    _videoCoverImg = [self getImage:[[_videoURL absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
+    _videoCoverImg = [UIImage getThumbnailByVideoPath:[[_videoURL absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
     UIImageView* bgImgView = [[UIImageView alloc] initWithImage:_videoCoverImg];
     [self.view addSubview:bgImgView];
     UIView* superView = self.view;
@@ -97,7 +98,7 @@
     
     UIImageView* changeImageView = [[UIImageView alloc] init];
     //    changeImageView.image = [[AppDelegate appDelegate].cmImageSize getImage:[[_videoURL absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
-    changeImageView.image = [self getImage:[[_videoURL absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
+    changeImageView.image = [UIImage getThumbnailByVideoPath:[[_videoURL absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
     //    [[AppDelegate appDelegate].cmImageSize getImage:[[_videoURL absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]]
     changeImageView.contentMode = UIViewContentModeScaleAspectFill;
     changeImageView.clipsToBounds = YES;
@@ -513,32 +514,6 @@
 }
 - (BOOL)prefersStatusBarHidden {
     return YES;
-}
-
-#pragma mark 通过视频的URL，获得视频缩略图
--(UIImage *)getImage:(NSString *)videoURL
-
-{
-    
-    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:[NSURL fileURLWithPath:videoURL] options:nil];
-    
-    AVAssetImageGenerator *gen = [[AVAssetImageGenerator alloc] initWithAsset:asset];
-    
-    gen.appliesPreferredTrackTransform = YES;
-    
-    CMTime time = CMTimeMakeWithSeconds(0.0, 600);
-    
-    NSError *error = nil;
-    
-    CMTime actualTime;
-    
-    CGImageRef image = [gen copyCGImageAtTime:time actualTime:&actualTime error:&error];
-    
-    UIImage *thumb = [[UIImage alloc] initWithCGImage:image];
-    
-    CGImageRelease(image);
-    
-    return thumb;
 }
 
 -(void)dealloc

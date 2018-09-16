@@ -296,7 +296,6 @@
 		D09D2B692148CB380097B0EF /* BackToVideoCammer@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A892148CB370097B0EF /* BackToVideoCammer@3x.png */; };
 		D09D2B6A2148CB380097B0EF /* record_ico_input_1@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A8A2148CB370097B0EF /* record_ico_input_1@2x.png */; };
 		D09D2B6B2148CB380097B0EF /* beautyON@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A8B2148CB370097B0EF /* beautyON@2x.png */; };
-		D09D2B6C2148CB380097B0EF /* LDWatermark_副本.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A8C2148CB370097B0EF /* LDWatermark_副本.png */; };
 		D09D2B6D2148CB380097B0EF /* 96.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A8D2148CB370097B0EF /* 96.png */; };
 		D09D2B6E2148CB380097B0EF /* beautyOFF@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A8E2148CB370097B0EF /* beautyOFF@3x.png */; };
 		D09D2B6F2148CB380097B0EF /* complete@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2A8F2148CB370097B0EF /* complete@3x.png */; };
@@ -314,9 +313,12 @@
 		D09D2C882148E5550097B0EF /* icon_weixin_selected@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2C7F2148E5550097B0EF /* icon_weixin_selected@3x.png */; };
 		D09D2C892148E5550097B0EF /* icon_weixin_pyq@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2C802148E5550097B0EF /* icon_weixin_pyq@2x.png */; };
 		D09D2C8B2148E5EE0097B0EF /* icon_weixin_pyq_selected@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D09D2C8A2148E5ED0097B0EF /* icon_weixin_pyq_selected@2x.png */; };
-		D201FD74214D528B00FC5A5E /* LDWatermark.png in Resources */ = {isa = PBXBuildFile; fileRef = D201FD73214D528B00FC5A5E /* LDWatermark.png */; };
 		D213E8A221496251002B8E63 /* AlpVideoCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D213E8A121496251002B8E63 /* AlpVideoCameraViewController.m */; };
 		D213E8A521496B7E002B8E63 /* ALPVideoCameraView.m in Sources */ = {isa = PBXBuildFile; fileRef = D213E8A421496B7E002B8E63 /* ALPVideoCameraView.m */; };
+		D26A90D1214DF6BA00C118CA /* icon_watermark.png in Resources */ = {isa = PBXBuildFile; fileRef = D26A90D0214DF6B900C118CA /* icon_watermark.png */; };
+		D26A90D4214DF8CF00C118CA /* Fullscreen@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = D26A90D2214DF8CF00C118CA /* Fullscreen@3x.png */; };
+		D26A90D5214DF8CF00C118CA /* Fullscreen@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D26A90D3214DF8CF00C118CA /* Fullscreen@2x.png */; };
+		D26A90D8214DFD9A00C118CA /* UIImage+AlpExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = D26A90D7214DFD9A00C118CA /* UIImage+AlpExtensions.m */; };
 		FEBFDF1ED94F17084C32D2E9 /* libPods-AlpVideoCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CADB371C0B6A5A9FB848C148 /* libPods-AlpVideoCamera.a */; };
 /* End PBXBuildFile section */
 
@@ -794,7 +796,6 @@
 		D09D2A892148CB370097B0EF /* BackToVideoCammer@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "BackToVideoCammer@3x.png"; sourceTree = "<group>"; };
 		D09D2A8A2148CB370097B0EF /* record_ico_input_1@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "record_ico_input_1@2x.png"; sourceTree = "<group>"; };
 		D09D2A8B2148CB370097B0EF /* beautyON@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "beautyON@2x.png"; sourceTree = "<group>"; };
-		D09D2A8C2148CB370097B0EF /* LDWatermark_副本.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "LDWatermark_副本.png"; sourceTree = "<group>"; };
 		D09D2A8D2148CB370097B0EF /* 96.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 96.png; sourceTree = "<group>"; };
 		D09D2A8E2148CB370097B0EF /* beautyOFF@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "beautyOFF@3x.png"; sourceTree = "<group>"; };
 		D09D2A8F2148CB370097B0EF /* complete@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "complete@3x.png"; sourceTree = "<group>"; };
@@ -816,11 +817,15 @@
 		D09D2C802148E5550097B0EF /* icon_weixin_pyq@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_weixin_pyq@2x.png"; sourceTree = "<group>"; };
 		D09D2C8A2148E5ED0097B0EF /* icon_weixin_pyq_selected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon_weixin_pyq_selected@2x.png"; sourceTree = "<group>"; };
 		D201FD70214D4A1B00FC5A5E /* AlpVideoCameraDefine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlpVideoCameraDefine.h; sourceTree = "<group>"; };
-		D201FD73214D528B00FC5A5E /* LDWatermark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LDWatermark.png; sourceTree = "<group>"; };
 		D213E8A021496251002B8E63 /* AlpVideoCameraViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlpVideoCameraViewController.h; sourceTree = "<group>"; };
 		D213E8A121496251002B8E63 /* AlpVideoCameraViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AlpVideoCameraViewController.m; sourceTree = "<group>"; };
 		D213E8A321496B7E002B8E63 /* ALPVideoCameraView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ALPVideoCameraView.h; sourceTree = "<group>"; };
 		D213E8A421496B7E002B8E63 /* ALPVideoCameraView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ALPVideoCameraView.m; sourceTree = "<group>"; };
+		D26A90D0214DF6B900C118CA /* icon_watermark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_watermark.png; sourceTree = "<group>"; };
+		D26A90D2214DF8CF00C118CA /* Fullscreen@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Fullscreen@3x.png"; sourceTree = "<group>"; };
+		D26A90D3214DF8CF00C118CA /* Fullscreen@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Fullscreen@2x.png"; sourceTree = "<group>"; };
+		D26A90D6214DFD9A00C118CA /* UIImage+AlpExtensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+AlpExtensions.h"; sourceTree = "<group>"; };
+		D26A90D7214DFD9A00C118CA /* UIImage+AlpExtensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+AlpExtensions.m"; sourceTree = "<group>"; };
 		D4FB502AC860C9DA42E825F5 /* Pods-AlpVideoCamera.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AlpVideoCamera.debug.xcconfig"; path = "Pods/Target Support Files/Pods-AlpVideoCamera/Pods-AlpVideoCamera.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1284,6 +1289,8 @@
 				D07D1AC3214A586A00162D30 /* AlpEditingPublishingViewController.h */,
 				D07D1AC4214A586A00162D30 /* AlpEditingPublishingViewController.m */,
 				D201FD70214D4A1B00FC5A5E /* AlpVideoCameraDefine.h */,
+				D26A90D6214DFD9A00C118CA /* UIImage+AlpExtensions.h */,
+				D26A90D7214DFD9A00C118CA /* UIImage+AlpExtensions.m */,
 				D09D29FE2148CB370097B0EF /* music */,
 				D09D2A3E2148CB370097B0EF /* stickers */,
 				D09D2A6C2148CB370097B0EF /* filterImage */,
@@ -1569,7 +1576,8 @@
 		D09D2A7B2148CB370097B0EF /* cammerImg */ = {
 			isa = PBXGroup;
 			children = (
-				D201FD73214D528B00FC5A5E /* LDWatermark.png */,
+				D26A90D3214DF8CF00C118CA /* Fullscreen@2x.png */,
+				D26A90D2214DF8CF00C118CA /* Fullscreen@3x.png */,
 				D09D2C8A2148E5ED0097B0EF /* icon_weixin_pyq_selected@2x.png */,
 				D09D2C792148E5540097B0EF /* GiftCheckmarkIcon@2x.png */,
 				D09D2C7D2148E5550097B0EF /* icon_weixin_pyq_selected@3x.png */,
@@ -1594,8 +1602,8 @@
 				D09D2A892148CB370097B0EF /* BackToVideoCammer@3x.png */,
 				D09D2A8A2148CB370097B0EF /* record_ico_input_1@2x.png */,
 				D09D2A8B2148CB370097B0EF /* beautyON@2x.png */,
-				D09D2A8C2148CB370097B0EF /* LDWatermark_副本.png */,
 				D09D2A8D2148CB370097B0EF /* 96.png */,
+				D26A90D0214DF6B900C118CA /* icon_watermark.png */,
 				D09D2A8E2148CB370097B0EF /* beautyOFF@3x.png */,
 				D09D2A8F2148CB370097B0EF /* complete@3x.png */,
 				D09D2A902148CB370097B0EF /* complete@2x.png */,
@@ -1692,7 +1700,7 @@
 				D09D2B172148CB370097B0EF /* icon545.png in Resources */,
 				D09D2C812148E5550097B0EF /* icon_weixin@3x.png in Resources */,
 				D09D2AFB2148CB370097B0EF /* music1.json in Resources */,
-				D201FD74214D528B00FC5A5E /* LDWatermark.png in Resources */,
+				D26A90D4214DF8CF00C118CA /* Fullscreen@3x.png in Resources */,
 				D09D2B682148CB380097B0EF /* del@3x.png in Resources */,
 				D09D2C872148E5550097B0EF /* icon_weixin@2x.png in Resources */,
 				D09D2B162148CB370097B0EF /* audio545.mp3 in Resources */,
@@ -1707,6 +1715,8 @@
 				D09D2B272148CB380097B0EF /* stickers564.jpg in Resources */,
 				D09D2B562148CB380097B0EF /* GPUImageSoftEleganceFilter.png in Resources */,
 				D09D2B632148CB380097B0EF /* record_ico_input_1@3x.png in Resources */,
+				D26A90D1214DF6BA00C118CA /* icon_watermark.png in Resources */,
+				D26A90D5214DF8CF00C118CA /* Fullscreen@2x.png in Resources */,
 				D09D2B302148CB380097B0EF /* stickers538.jpg in Resources */,
 				D09D2B0E2148CB370097B0EF /* icon532.png in Resources */,
 				D09D2B322148CB380097B0EF /* stickers529.jpg in Resources */,
@@ -1794,7 +1804,6 @@
 				D09D2B6E2148CB380097B0EF /* beautyOFF@3x.png in Resources */,
 				D09D2B402148CB380097B0EF /* stickers553.jpg in Resources */,
 				D09D2B2A2148CB380097B0EF /* stickers562.jpg in Resources */,
-				D09D2B6C2148CB380097B0EF /* LDWatermark_副本.png in Resources */,
 				D09D2B032148CB370097B0EF /* icon529.png in Resources */,
 				D09D2B3D2148CB380097B0EF /* stickers545.jpg in Resources */,
 				D09D2B1F2148CB370097B0EF /* audio533.mp3 in Resources */,
@@ -1865,6 +1874,7 @@
 				D09D29D32148BCD90097B0EF /* GPUImageNobleCornerDetectionFilter.m in Sources */,
 				D09D29CA2148BCD90097B0EF /* GPUImageVideoCamera.m in Sources */,
 				D09D29682148BCD80097B0EF /* GPUImageAlphaBlendFilter.m in Sources */,
+				D26A90D8214DFD9A00C118CA /* UIImage+AlpExtensions.m in Sources */,
 				D09D297A2148BCD80097B0EF /* GPUImageCropFilter.m in Sources */,
 				D09D296E2148BCD80097B0EF /* GPUImageHarrisCornerDetectionFilter.m in Sources */,
 				D09D296B2148BCD80097B0EF /* GPUImageOverlayBlendFilter.m in Sources */,

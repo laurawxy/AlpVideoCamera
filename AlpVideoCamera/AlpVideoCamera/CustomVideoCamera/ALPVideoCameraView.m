@@ -229,7 +229,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
 }
 
 
-- (IBAction)startRecording:(UIButton*)sender {
+- (void)startRecording:(UIButton*)sender {
     _inputLocalVieoBtn.hidden = YES;
     if (!sender.selected) {
         
@@ -291,7 +291,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     
 }
 
-- (IBAction)stopRecording:(id)sender {
+- (void)stopRecording:(id)sender {
     _videoCamera.audioEncodingTarget = nil;
     NSLog(@"Path %@",_pathToMovie);
     if (_pathToMovie == nil) {
@@ -463,7 +463,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
                                                                         preferredTrackID:kCMPersistentTrackID_Invalid];
     
     
-    UIImage* waterImg = [UIImage imageNamed:@"LDWatermark"];
+    UIImage* waterImg = [UIImage imageNamed:@"icon_watermark"];
     CMTime totalDuration = kCMTimeZero;
     for (int i = 0; i < videosPathArray.count; i++) {
         //        AVURLAsset *asset = [AVURLAsset assetWithURL:[NSURL URLWithString:videosPathArray[i]]];
@@ -993,13 +993,11 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
         
     }
 }
--(void)notCloseCor
-{
+-(void)notCloseCor {
     [self clickBackToHome];
 }
 
--(void)dealloc
-{
+-(void)dealloc {
     NSLog(@"%@释放了",self.class);
 }
 @end
