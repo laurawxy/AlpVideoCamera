@@ -9,7 +9,7 @@
 #import "UIView+Tools.h"
 
 @implementation UIView (Tools)
--(void)makeCornerRadius:(float)radius borderColor:(UIColor *)bColor borderWidth:(float)bWidth{
+- (void)makeCornerRadius:(float)radius borderColor:(UIColor *)bColor borderWidth:(float)bWidth{
     self.layer.borderWidth = bWidth;
     
     if (bColor != nil) {

@@ -22,7 +22,7 @@
 #import <Photos/PHImageManager.h>
 #import "GPUImage.h"
 #import "AlpVideoCameraDefine.h"
-
+#import "AlpVideoCameraUtils.h"
 
 typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     CameraManagerDevicePositionBack,
@@ -72,16 +72,10 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
 @implementation ALPVideoCameraView
 
 - (instancetype) initWithFrame:(CGRect)frame{
-    if (!(self = [super initWithFrame:frame]))
-    {
+    if (!(self = [super initWithFrame:frame])) {
         return nil;
     }
     [self setup];
-    
-    //    [videoCamera removeAllTargets];
-    //    filter = [[GPUImageBeautifyFilter alloc] init];
-    //    [videoCamera addTarget:beautifyFilter];
-    //    [beautifyFilter addTarget:_filteredVideoView];
     
     return self;
 }
@@ -109,7 +103,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     _preLayerHWRate =_preLayerHeight/_preLayerWidth;
     _lastAry = [[NSMutableArray alloc] init];
     _urlArray = [[NSMutableArray alloc]init];
-    [self createVideoFolderIfNotExist];
+    [AlpVideoCameraUtils createVideoFolderIfNotExist];
     _mainScreenFrame = self.frame;
     _videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset1280x720 cameraPosition:AVCaptureDevicePositionBack];
     if ([_videoCamera.inputCamera lockForConfiguration:nil]) {
@@ -142,14 +136,18 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     [_videoCamera addTarget:_filter];
     [_filter addTarget:_filteredVideoView];
     [_videoCamera startCameraCapture];
-    [self addSomeView];
+    [self setupUI];
     UITapGestureRecognizer *singleFingerOne = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(cameraViewTapAction:)];
     singleFingerOne.numberOfTouchesRequired = 1; //手指数
     singleFingerOne.numberOfTapsRequired = 1; //tap次数
     [_filteredVideoView addGestureRecognizer:singleFingerOne];
     [self addSubview:_filteredVideoView];
 }
-- (void) addSomeView{
+
+////////////////////////////////////////////////////////////////////////
+#pragma mark - UI
+////////////////////////////////////////////////////////////////////////
+- (void) setupUI{
     //    253 91 73
     _timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(20.0, 27.0, 80, 26.0)];
     _timeLabel.font = [UIFont systemFontOfSize:13.0f];
@@ -158,7 +156,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     _timeLabel.backgroundColor = [UIColor colorWithRed:253/256.0 green:91/256.0 blue:73/256.0 alpha:1];
     _timeLabel.textColor = [UIColor whiteColor];
     [_filteredVideoView addSubview:_timeLabel];
-    //    [[AppDelegate appDelegate].cmImageSize setLabelsRounded:_timeLabel cornerRadiusValue:2 borderWidthValue:0 borderColorWidthValue:[UIColor clearColor]];
+  
     _timeLabel.hidden = YES;
     
     
@@ -175,26 +173,30 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     
     [_filteredVideoView addSubview:_photoCaptureButton];
     
-    
-    _camerafilterChangeButton = [[UIButton alloc] init];
-    _camerafilterChangeButton.frame = CGRectMake(SCREEN_WIDTH - 160,  25, 30.0, 30.0);
-    UIImage* img = [UIImage imageNamed:@"beautyOFF"];
-    [_camerafilterChangeButton setImage:img forState:UIControlStateNormal];
-    [_camerafilterChangeButton setImage:[UIImage imageNamed:@"beautyON"] forState:UIControlStateSelected];
-    [_camerafilterChangeButton addTarget:self action:@selector(changebeautifyFilterBtn:) forControlEvents:UIControlEventTouchUpInside];
-    [_filteredVideoView addSubview:_camerafilterChangeButton];
-    
+    // 返回按钮
     UIButton* backBtn = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - 60, 25, 30, 30)];
     [backBtn setImage:[UIImage imageNamed:@"BackToHome"] forState:UIControlStateNormal];
     [backBtn addTarget:self action:@selector(clickBackToHome) forControlEvents:UIControlEventTouchUpInside];
     [_filteredVideoView addSubview:backBtn];
     
-    _cameraPositionChangeButton = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - 110, 25, 30, 30)];
+    // 前后摄像头切换按钮
+    _cameraPositionChangeButton = [[UIButton alloc] initWithFrame:CGRectMake(backBtn.frame.origin.x, backBtn.frame.origin.y + 60, 30, 30)];
     UIImage* img2 = [UIImage imageNamed:@"cammera"];
     [_cameraPositionChangeButton setImage:img2 forState:UIControlStateNormal];
     [_cameraPositionChangeButton addTarget:self action:@selector(changeCameraPositionBtn:) forControlEvents:UIControlEventTouchUpInside];
     [_filteredVideoView addSubview:_cameraPositionChangeButton];
     
+    // 打开和关闭美颜按钮
+    _camerafilterChangeButton = [[UIButton alloc] init];
+    _camerafilterChangeButton.frame = CGRectMake(_cameraPositionChangeButton.frame.origin.x, _cameraPositionChangeButton.frame.origin.y + 80, 30, 30);
+    UIImage* img = [UIImage imageNamed:@"iconBeautyOff2_40x40_"];
+    [_camerafilterChangeButton setImage:img forState:UIControlStateNormal];
+    [_camerafilterChangeButton setImage:[UIImage imageNamed:@"iconBeautyOn2_40x40_"] forState:UIControlStateSelected];
+    [_camerafilterChangeButton addTarget:self action:@selector(changebeautifyFilterBtn:) forControlEvents:UIControlEventTouchUpInside];
+    [_filteredVideoView addSubview:_camerafilterChangeButton];
+    
+    
+    // 完成录制按钮
     _cameraChangeButton  = [[UIButton alloc] init];
     _cameraChangeButton.hidden = YES;
     _cameraChangeButton.frame = CGRectMake(SCREEN_WIDTH - 100 , SCREEN_HEIGHT - 105.0, 52.6, 50.0);
@@ -203,6 +205,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     [_cameraChangeButton addTarget:self action:@selector(stopRecording:) forControlEvents:UIControlEventTouchUpInside];
     [_filteredVideoView addSubview:_cameraChangeButton];
     
+    // 删除录制按钮
     _dleButton = [[UIButton alloc] init];
     _dleButton.hidden = YES;
     _dleButton.frame = CGRectMake( 50 , SCREEN_HEIGHT - 105.0, 50, 50.0);
@@ -214,21 +217,26 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     _inputLocalVieoBtn = [[UIButton alloc] init];
     //    _inputLocalVieoBtn.hidden = YES;
     _inputLocalVieoBtn.frame = CGRectMake( 50 , SCREEN_HEIGHT - 105.0, 50, 50.0);
+    
+    // 从相册中导入视频按钮
     UIImage* img5 = [UIImage imageNamed:@"record_ico_input_1"];
     [_inputLocalVieoBtn setImage:img5 forState:UIControlStateNormal];
     [_inputLocalVieoBtn addTarget:self action:@selector(clickInputBtn:) forControlEvents:UIControlEventTouchUpInside];
     [_filteredVideoView addSubview:_inputLocalVieoBtn];
     
-    
+    // 录制的进度条
     _progressPreView = [[UIView alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT -4 , 0, 4)];
     _progressPreView.backgroundColor = UIColorFromRGB(0xffc738);
     [_progressPreView makeCornerRadius:2 borderColor:nil borderWidth:0];
     [_filteredVideoView addSubview:_progressPreView];
     
-    
 }
 
+////////////////////////////////////////////////////////////////////////
+#pragma mark - Actions
+////////////////////////////////////////////////////////////////////////
 
+/// 开始录制视频
 - (void)startRecording:(UIButton*)sender {
     _inputLocalVieoBtn.hidden = YES;
     if (!sender.selected) {
@@ -261,8 +269,8 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
                                                  userInfo:nil
                                                   repeats:YES];
         
-    }else
-    {
+    }
+    else {
         
         _camerafilterChangeButton.hidden = NO;
         _cameraPositionChangeButton.hidden = NO;
@@ -291,6 +299,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     
 }
 
+/// 停止录制视频
 - (void)stopRecording:(id)sender {
     _videoCamera.audioEncodingTarget = nil;
     NSLog(@"Path %@",_pathToMovie);
@@ -315,19 +324,37 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     
     //    [_urlArray addObject:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@",_pathToMovie]]];
     //    [self mergeAndExportVideosAtFileURLs:_urlArray];
-    NSString *path = [self getVideoMergeFilePathString];
+    NSString *outPath = [AlpVideoCameraUtils getVideoMergeFilePathString];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self mergeAndExportVideos:_urlArray withOutPath:path];
-        [_urlArray removeAllObjects];
-        [_lastAry removeAllObjects];
-        _currentTime = 0;
-        _lastTime = 0;
-        _dleButton.hidden = YES;
-        [_progressPreView setFrame:CGRectMake(0, SCREEN_HEIGHT - 4, 0, 4)];
-        _btView.backgroundColor = [UIColor colorWithRed:250/256.0 green:211/256.0 blue:75/256.0 alpha:1];
-        _photoCaptureButton.backgroundColor = [UIColor colorWithRed:250/256.0 green:211/256.0 blue:75/256.0 alpha:1];
-        _photoCaptureButton.selected = NO;
-        _cameraChangeButton.hidden = YES;
+        __weak typeof(self) weakSelf = self;
+        __weak typeof(self->_videoCamera) weakVideoCamera = self->_videoCamera;
+        [AlpVideoCameraUtils mergeVideos:self->_urlArray exportPath:outPath watermarkImg: [UIImage imageNamed:@"icon_watermark"] completion:^(NSURL * _Nonnull outLocalURL) {
+            [weakVideoCamera stopCameraCapture];
+            
+            AlpEditVideoViewController* vc = [[AlpEditVideoViewController alloc]init];
+            vc.width = weakSelf.width;
+            vc.hight = weakSelf.hight;
+            vc.bit = weakSelf.bit;
+            vc.frameRate = weakSelf.frameRate;
+            vc.videoURL = outLocalURL;
+            [[NSNotificationCenter defaultCenter] removeObserver:weakSelf];
+            //            [[AppDelegate sharedAppDelegate] pushViewController:view animated:YES];
+            if (weakSelf.delegate&&[weakSelf.delegate respondsToSelector:@selector(videoCamerView:pushViewCotroller:)]) {
+                [weakSelf.delegate videoCamerView:weakSelf pushViewCotroller:vc];
+            }
+            [weakSelf removeFromSuperview];
+        }];
+
+        [self->_urlArray removeAllObjects];
+        [self->_lastAry removeAllObjects];
+        self->_currentTime = 0;
+        self->_lastTime = 0;
+        self->_dleButton.hidden = YES;
+        [self->_progressPreView setFrame:CGRectMake(0, SCREEN_HEIGHT - 4, 0, 4)];
+        self->_btView.backgroundColor = [UIColor colorWithRed:250/256.0 green:211/256.0 blue:75/256.0 alpha:1];
+        self->_photoCaptureButton.backgroundColor = [UIColor colorWithRed:250/256.0 green:211/256.0 blue:75/256.0 alpha:1];
+        self->_photoCaptureButton.selected = NO;
+        self->_cameraChangeButton.hidden = YES;
         
         
     });
@@ -341,7 +368,9 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     
     //[_movieWriter cancelRecording];
 }
--(void)clickDleBtn:(UIButton*)sender {
+
+/// 删除当前已经录制的内容
+- (void)clickDleBtn:(UIButton*)sender {
     float progressWidth = [_lastAry.lastObject floatValue]/10*SCREEN_WIDTH;
     [_progressPreView setFrame:CGRectMake(0, SCREEN_HEIGHT - 4, progressWidth, 4)];
     _currentTime = [_lastAry.lastObject floatValue];
@@ -358,6 +387,8 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     }
     
 }
+
+/// 从相册中导入视频
 -(void)clickInputBtn:(UIButton*)sender {
     TZImagePickerController* imagePickerVc = [[TZImagePickerController alloc] initWithMaxImagesCount:1 delegate:self];
     imagePickerVc.isSelectOriginalPhoto = NO;
@@ -405,8 +436,8 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
                 });
                 
             }];
-        }else
-        {
+        }
+        else  {
             dispatch_async(dispatch_get_main_queue(), ^{
                 ALAsset* myasset = asset;
                 NSURL *videoURL =[myasset valueForProperty:ALAssetPropertyAssetURL];
@@ -448,285 +479,9 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     }
     
 }
-- (void)mergeAndExportVideos:(NSArray*)videosPathArray withOutPath:(NSString*)outpath{
-    if (videosPathArray.count == 0) {
-        return;
-    }
-    //音频视频合成体
-    AVMutableComposition *mixComposition = [[AVMutableComposition alloc] init];
-    
-    //创建音频通道容器
-    AVMutableCompositionTrack *audioTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio
-                                                                        preferredTrackID:kCMPersistentTrackID_Invalid];
-    //创建视频通道容器
-    AVMutableCompositionTrack *videoTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeVideo
-                                                                        preferredTrackID:kCMPersistentTrackID_Invalid];
-    
-    
-    UIImage* waterImg = [UIImage imageNamed:@"icon_watermark"];
-    CMTime totalDuration = kCMTimeZero;
-    for (int i = 0; i < videosPathArray.count; i++) {
-        //        AVURLAsset *asset = [AVURLAsset assetWithURL:[NSURL URLWithString:videosPathArray[i]]];
-        NSDictionary* options = @{AVURLAssetPreferPreciseDurationAndTimingKey:@YES};
-        AVAsset* asset = [AVURLAsset URLAssetWithURL:videosPathArray[i] options:options];
-        
-        NSError *erroraudio = nil;
-        //获取AVAsset中的音频 或者视频
-        AVAssetTrack *assetAudioTrack = [[asset tracksWithMediaType:AVMediaTypeAudio] firstObject];
-        //向通道内加入音频或者视频
-        BOOL ba = [audioTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, asset.duration)
-                                      ofTrack:assetAudioTrack
-                                       atTime:totalDuration
-                                        error:&erroraudio];
-        
-        NSLog(@"erroraudio:%@%d",erroraudio,ba);
-        NSError *errorVideo = nil;
-        AVAssetTrack *assetVideoTrack = [[asset tracksWithMediaType:AVMediaTypeVideo]firstObject];
-        BOOL bl = [videoTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, asset.duration)
-                                      ofTrack:assetVideoTrack
-                                       atTime:totalDuration
-                                        error:&errorVideo];
-        
-        NSLog(@"errorVideo:%@%d",errorVideo,bl);
-        totalDuration = CMTimeAdd(totalDuration, asset.duration);
-    }
-    NSLog(@"%@",NSHomeDirectory());
-    
-    //创建视频水印layer 并添加到视频layer上
-    //2017 年 04 月 19 日 视频水印由后台统一转码添加   del by hyy；
-    CGSize videoSize = [videoTrack naturalSize];
-    CALayer* aLayer = [CALayer layer];
-    aLayer.contents = (id)waterImg.CGImage;
-    aLayer.frame = CGRectMake(videoSize.width - waterImg.size.width - 30, videoSize.height - waterImg.size.height*3, waterImg.size.width, waterImg.size.height);
-    aLayer.opacity = 0.9;
-    
-    CALayer *parentLayer = [CALayer layer];
-    CALayer *videoLayer = [CALayer layer];
-    parentLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
-    videoLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
-    [parentLayer addSublayer:videoLayer];
-    [parentLayer addSublayer:aLayer];
-    AVMutableVideoComposition* videoComp = [AVMutableVideoComposition videoComposition];
-    videoComp.renderSize = videoSize;
-    
-    
-    videoComp.frameDuration = CMTimeMake(1, 30);
-    videoComp.animationTool = [AVVideoCompositionCoreAnimationTool videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer inLayer:parentLayer];
-    AVMutableVideoCompositionInstruction* instruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
-    
-    instruction.timeRange = CMTimeRangeMake(kCMTimeZero, [mixComposition duration]);
-    AVAssetTrack* mixVideoTrack = [[mixComposition tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
-    AVMutableVideoCompositionLayerInstruction* layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:mixVideoTrack];
-    instruction.layerInstructions = [NSArray arrayWithObject:layerInstruction];
-    videoComp.instructions = [NSArray arrayWithObject: instruction];
-    
-    
-    NSURL *mergeFileURL = [NSURL fileURLWithPath:outpath];
-    
-    //视频导出工具
-    AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:mixComposition
-                                                                      presetName:AVAssetExportPreset1280x720];
-    exporter.videoComposition = videoComp;
-    /*
-     exporter.progress
-     导出进度
-     This property is not key-value observable.
-     不支持kvo 监听
-     只能用定时器监听了  NStimer
-     */
-    exporter.outputURL = mergeFileURL;
-    exporter.outputFileType = AVFileTypeQuickTimeMovie;
-    exporter.shouldOptimizeForNetworkUse = YES;
-    __weak typeof(self) weakSelf = self;
-    [exporter exportAsynchronouslyWithCompletionHandler:^{
-        dispatch_async(dispatch_get_main_queue(), ^{
-            
-            [_videoCamera stopCameraCapture];
-            
-            AlpEditVideoViewController* vc = [[AlpEditVideoViewController alloc]init];
-            vc.width = weakSelf.width;
-            vc.hight = weakSelf.hight;
-            vc.bit = weakSelf.bit;
-            vc.frameRate = weakSelf.frameRate;
-            vc.videoURL = [NSURL fileURLWithPath:outpath];;
-            [[NSNotificationCenter defaultCenter] removeObserver:weakSelf];
-            //            [[AppDelegate sharedAppDelegate] pushViewController:view animated:YES];
-            if (weakSelf.delegate&&[weakSelf.delegate respondsToSelector:@selector(videoCamerView:pushViewCotroller:)]) {
-                [weakSelf.delegate videoCamerView:weakSelf pushViewCotroller:vc];
-            }
-            [weakSelf removeFromSuperview];
-        });
-        
-        
-    }];
-    
-    
-    ////    UIImage* waterImg = [UIImage imageNamed:@"LDWatermark"];
-    //    CMTime totalDuration = kCMTimeZero;
-    //    for (int i = 0; i < videosPathArray.count; i++) {
-    ////        AVURLAsset *asset = [AVURLAsset assetWithURL:[NSURL URLWithString:videosPathArray[i]]];
-    //        NSDictionary* options = @{AVURLAssetPreferPreciseDurationAndTimingKey:@YES};
-    //        AVAsset* asset = [AVURLAsset URLAssetWithURL:videosPathArray[i] options:options];
-    //
-    //        NSError *erroraudio = nil;
-    //        //获取AVAsset中的音频 或者视频
-    //        AVAssetTrack *assetAudioTrack = [[asset tracksWithMediaType:AVMediaTypeAudio] firstObject];
-    //        //向通道内加入音频或者视频
-    //        BOOL ba = [audioTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, asset.duration)
-    //                                      ofTrack:assetAudioTrack
-    //                                       atTime:totalDuration
-    //                                        error:&erroraudio];
-    //
-    //        NSLog(@"erroraudio:%@%d",erroraudio,ba);
-    //        NSError *errorVideo = nil;
-    //        AVAssetTrack *assetVideoTrack = [[asset tracksWithMediaType:AVMediaTypeVideo]firstObject];
-    //        BOOL bl = [videoTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, asset.duration)
-    //                                      ofTrack:assetVideoTrack
-    //                                       atTime:totalDuration
-    //                                        error:&errorVideo];
-    //
-    //        NSLog(@"errorVideo:%@%d",errorVideo,bl);
-    //        totalDuration = CMTimeAdd(totalDuration, asset.duration);
-    //    }
-    //    NSLog(@"%@",NSHomeDirectory());
-    //
-    //    //创建视频水印layer 并添加到视频layer上
-    //    //2017 年 04 月 19 日 视频水印由后台统一转码添加   del by hyy；
-    ////    CGSize videoSize = [videoTrack naturalSize];
-    ////    CALayer* aLayer = [CALayer layer];
-    ////    aLayer.contents = (id)waterImg.CGImage;
-    ////    aLayer.frame = CGRectMake(videoSize.width - waterImg.size.width - 30, videoSize.height - waterImg.size.height*3, waterImg.size.width, waterImg.size.height);
-    ////    aLayer.opacity = 0.9;
-    ////
-    ////    CALayer *parentLayer = [CALayer layer];
-    ////    CALayer *videoLayer = [CALayer layer];
-    ////    parentLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
-    ////    videoLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
-    ////    [parentLayer addSublayer:videoLayer];
-    ////    [parentLayer addSublayer:aLayer];
-    ////    AVMutableVideoComposition* videoComp = [AVMutableVideoComposition videoComposition];
-    ////    videoComp.renderSize = videoSize;
-    ////
-    ////
-    ////    videoComp.frameDuration = CMTimeMake(1, 30);
-    ////    videoComp.animationTool = [AVVideoCompositionCoreAnimationTool videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer inLayer:parentLayer];
-    ////    AVMutableVideoCompositionInstruction* instruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
-    ////
-    ////    instruction.timeRange = CMTimeRangeMake(kCMTimeZero, [mixComposition duration]);
-    ////    AVAssetTrack* mixVideoTrack = [[mixComposition tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
-    ////    AVMutableVideoCompositionLayerInstruction* layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:mixVideoTrack];
-    ////    instruction.layerInstructions = [NSArray arrayWithObject:layerInstruction];
-    ////    videoComp.instructions = [NSArray arrayWithObject: instruction];
-    //
-    //
-    //    NSURL *mergeFileURL = [NSURL fileURLWithPath:outpath];
-    //
-    //    //视频导出工具
-    //    AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:mixComposition
-    //                                                                      presetName:AVAssetExportPreset1280x720];
-    ////    exporter.videoComposition = videoComp;
-    //    /*
-    //    exporter.progress
-    //     导出进度
-    //     This property is not key-value observable.
-    //     不支持kvo 监听
-    //     只能用定时器监听了  NStimer
-    //     */
-    //    exporter.outputURL = mergeFileURL;
-    //    exporter.outputFileType = AVFileTypeQuickTimeMovie;
-    //    exporter.shouldOptimizeForNetworkUse = YES;
-    //    [exporter exportAsynchronouslyWithCompletionHandler:^{
-    //        dispatch_async(dispatch_get_main_queue(), ^{
-    //
-    //            [videoCamera stopCameraCapture];
-    //
-    //            EditVideoViewController* view = [[EditVideoViewController alloc]init];
-    //            view.width = _width;
-    //            view.hight = _hight;
-    //            view.bit = _bit;
-    //            view.frameRate = _frameRate;
-    //            view.videoURL = [NSURL fileURLWithPath:outpath];;
-    //            [[NSNotificationCenter defaultCenter] removeObserver:self];
-    //            [[AppDelegate sharedAppDelegate] pushViewController:view animated:YES];
-    //            [self removeFromSuperview];
-    //        });
-    //
-    //
-    //        }];
-}
 
-
-- (UIViewController *)getCurrentVC
-{
-    UIViewController *result = nil;
-    
-    UIWindow * window = [[UIApplication sharedApplication] keyWindow];
-    if (window.windowLevel != UIWindowLevelNormal)
-    {
-        NSArray *windows = [[UIApplication sharedApplication] windows];
-        for(UIWindow * tmpWin in windows)
-        {
-            if (tmpWin.windowLevel == UIWindowLevelNormal)
-            {
-                window = tmpWin;
-                break;
-            }
-        }
-    }
-    
-    UIView *frontView = [[window subviews] objectAtIndex:0];
-    id nextResponder = [frontView nextResponder];
-    
-    if ([nextResponder isKindOfClass:[UIViewController class]])
-        result = nextResponder;
-    else
-        result = window.rootViewController;
-    
-    return result;
-}
-//最后合成为 mp4
-- (NSString *)getVideoMergeFilePathString
-{
-    //    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    //    NSString *path = [paths objectAtIndex:0];
-    
-    //沙盒中Temp路径
-    NSString *tempPath = NSTemporaryDirectory();
-    
-    NSString* path = [tempPath stringByAppendingPathComponent:VIDEO_FOLDER];
-    
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    formatter.dateFormat = @"yyyyMMddHHmmss";
-    NSString *nowTimeStr = [formatter stringFromDate:[NSDate dateWithTimeIntervalSinceNow:0]];
-    
-    NSString *fileName = [[path stringByAppendingPathComponent:nowTimeStr] stringByAppendingString:@"merge.mov"];
-    
-    return fileName;
-}
-
-- (void)createVideoFolderIfNotExist
-{
-    //    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    //    NSString *path = [paths objectAtIndex:0];
-    
-    //沙盒中Temp路径
-    NSString *tempPath = NSTemporaryDirectory();
-    NSString *folderPath = [tempPath stringByAppendingPathComponent:VIDEO_FOLDER];
-    
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    BOOL isDir = NO;
-    BOOL isDirExist = [fileManager fileExistsAtPath:folderPath isDirectory:&isDir];
-    
-    if(!(isDirExist && isDir))
-    {
-        BOOL bCreateDir = [fileManager createDirectoryAtPath:folderPath withIntermediateDirectories:YES attributes:nil error:nil];
-        if(!bCreateDir){
-            NSLog(@"创建保存视频文件夹失败");
-        }
-    }
-}
--(void)clickBackToHome
-{
+/// 退出
+- (void)clickBackToHome {
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_videoCamera stopCameraCapture];
@@ -749,7 +504,9 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     
     
 }
--(void)changeCameraPositionBtn:(UIButton*)sender{
+
+/// 切换前后摄像头
+- (void)changeCameraPositionBtn:(UIButton*)sender{
     
     switch (_position) {
         case CameraManagerDevicePositionBack: {
@@ -804,6 +561,8 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     
     
 }
+
+/// 打开或关闭美颜功能
 - (void)changebeautifyFilterBtn:(UIButton*)sender{
     if (!sender.selected) {
         
@@ -825,7 +584,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     }
 }
 
-
+/// 录制时timer更新UI
 - (void)updateTimer:(NSTimer *)sender{
     //    NSDateFormatter *dateFormator = [[NSDateFormatter alloc] init];
     //    dateFormator.dateFormat = @"HH:mm:ss";
@@ -868,7 +627,8 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     }
 }
 
-- (void)setfocusImage{
+/// 设置相机对焦的layer
+- (void)setfocusImage {
     UIImage *focusImage = [UIImage imageNamed:@"96"];
     UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, focusImage.size.width, focusImage.size.height)];
     imageView.image = focusImage;
@@ -912,46 +672,10 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     _focusLayer.hidden = YES;
 }
 
-/**
- @abstract 将UI的坐标转换成相机坐标
- */
-- (CGPoint)convertToPointOfInterestFromViewCoordinates:(CGPoint)viewCoordinates
-{
-    CGPoint pointOfInterest = CGPointMake(.5f, .5f);
-    CGSize frameSize = _filteredVideoView.frame.size;
-    CGSize apertureSize = CGSizeMake(1280, 720);//设备采集分辨率
-    CGPoint point = viewCoordinates;
-    CGFloat apertureRatio = apertureSize.height / apertureSize.width;
-    CGFloat viewRatio = frameSize.width / frameSize.height;
-    CGFloat xc = .5f;
-    CGFloat yc = .5f;
-    
-    if (viewRatio > apertureRatio) {
-        CGFloat y2 = frameSize.height;
-        CGFloat x2 = frameSize.height * apertureRatio;
-        CGFloat x1 = frameSize.width;
-        CGFloat blackBar = (x1 - x2) / 2;
-        if (point.x >= blackBar && point.x <= blackBar + x2) {
-            xc = point.y / y2;
-            yc = 1.f - ((point.x - blackBar) / x2);
-        }
-    }else {
-        CGFloat y2 = frameSize.width / apertureRatio;
-        CGFloat y1 = frameSize.height;
-        CGFloat x2 = frameSize.width;
-        CGFloat blackBar = (y1 - y2) / 2;
-        if (point.y >= blackBar && point.y <= blackBar + y2) {
-            xc = ((point.y - blackBar) / y2);
-            yc = 1.f - (point.x / x2);
-        }
-    }
-    pointOfInterest = CGPointMake(xc, yc);
-    return pointOfInterest;
-}
 
 
--(void)cameraViewTapAction:(UITapGestureRecognizer *)tgr
-{
+/// 点击相机对焦
+- (void)cameraViewTapAction:(UITapGestureRecognizer *)tgr {
     if (tgr.state == UIGestureRecognizerStateRecognized && (_focusLayer == nil || _focusLayer.hidden)) {
         CGPoint location = [tgr locationInView:_filteredVideoView];
         [self setfocusImage];
@@ -966,7 +690,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
         //        }
         //
         //        pointOfInterest = CGPointMake(location.y / frameSize.height, 1.f - (location.x / frameSize.width));
-        CGPoint pointOfInterest = [self convertToPointOfInterestFromViewCoordinates:location];
+        CGPoint pointOfInterest = [AlpVideoCameraUtils convertToPointOfInterestFromViewCoordinates:location frameSize:_filteredVideoView.frame.size];
         NSError *error;
         if ([device lockForConfiguration:&error]) {
             
@@ -993,11 +717,11 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
         
     }
 }
--(void)notCloseCor {
+- (void)notCloseCor {
     [self clickBackToHome];
 }
 
--(void)dealloc {
+- (void)dealloc {
     NSLog(@"%@释放了",self.class);
 }
 @end
