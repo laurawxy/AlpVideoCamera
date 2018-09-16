@@ -12,5 +12,5 @@ target 'AlpVideoCamera' do
   pod 'SDWebImage'
   pod 'MBProgressHUD'
   pod 'TZImagePickerController'
-
+  pod 'GPUImage', '~> 0.1.7'
 end
