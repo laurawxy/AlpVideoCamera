@@ -15,7 +15,6 @@
 
 #define SCREEN_WIDTH [UIScreen mainScreen].bounds.size.width
 #define SCREEN_HEIGHT [UIScreen mainScreen].bounds.size.height
-#define TIMER_INTERVAL 0.05
 #define SCREEN_LayoutScaleBaseOnIPHEN6(x) (([UIScreen mainScreen].bounds.size.width)/375.00 * x)
 #define kSignatureContextLengths 20
 
@@ -25,5 +24,16 @@
 #define COLOR_FONT_YELLOW 0xFDD854
 #define COLOR_FONT_WHITE 0xFFFFFF
 
+/// 需要发布视频的通知
+static NSNotificationName const AlpPublushVideoNotification = @"AlpPublushVideoNotification";
+/// 关闭相机
+static NSNotificationName const AlpVideoCameraCloseNotification = @"AlpVideoCameraCloseNotification";
+/// 允许录制视频的最大时间
+static NSTimeInterval const AlpVideoRecordingMaxTime = 20.0;
+/// 选择的视频最大支持的大小,MB
+static CGFloat const AlpVideoCameraMaxVideoSize = 8.0;
+static CGFloat const TIMER_INTERVAL = 0.05;
+
+static NSString * const AlpContentTextFieldPlaceholder = @"点击添加描述(最多20个字)";
 
 #endif /* AlpVideoCameraDefine_h */

@@ -17,12 +17,19 @@
 #import "SDAVAssetExportSession.h"
 #import "TZImagePickerController.h"
 #import "TZImageManager.h"
-#import "AlpEditingPublishingViewController.h"
+//#import "AlpEditingPublishingViewController.h"
+#import "AlpEditPublishViewController.h"
 #import <Photos/Photos.h>
 #import <Photos/PHImageManager.h>
 #import "GPUImage.h"
 #import "AlpVideoCameraDefine.h"
 #import "AlpVideoCameraUtils.h"
+#import "OSProgressView.h"
+#import "AlpEditVideoParameter.h"
+
+/**
+ @note GPUImageVideoCamera录制视频 有时第一帧是黑屏 待解决
+ */
 
 typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     CameraManagerDevicePositionBack,
@@ -47,11 +54,9 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     float _preLayerHeight;//镜头高
     float _preLayerHWRate; //高，宽比
     NSMutableArray* _urlArray;
-    float _totalTime; //视频总长度 默认10秒
+    float _totalTime; //允许录制视频的最大长度 默认20秒
     float _currentTime; //当前视频长度
     float _lastTime; //记录上次时间
-    UIView* _progressPreView; //进度条
-    float _progressStep; //进度条每次变长的最小单位
     MBProgressHUD* _HUD;
 }
 @property (nonatomic ,strong) UIButton *camerafilterChangeButton;
@@ -65,18 +70,17 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
 @property (nonatomic, strong) NSMutableArray *lastAry;
 
 @property (nonatomic, strong) UIView* btView;
-
 @property (nonatomic, assign) BOOL isRecoding;
+@property (nonatomic, strong) OSProgressView *progressPreView;
+
 @end
 
 @implementation ALPVideoCameraView
 
 - (instancetype) initWithFrame:(CGRect)frame{
-    if (!(self = [super initWithFrame:frame])) {
-        return nil;
+    if (self = [super initWithFrame:frame]) {
+        [self setup];
     }
-    [self setup];
-    
     return self;
 }
 
@@ -90,14 +94,13 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
 }
 
 - (void)setup {
-    if (_totalTime==0) {
-        _totalTime =10;
+    if (_totalTime ==0 ) {
+        _totalTime =AlpVideoRecordingMaxTime;
         
     }
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notCloseCor) name:@"closeVideoCamerOne" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(closeVideoCameraNotification) name:AlpVideoCameraCloseNotification object:nil];
     
     _lastTime = 0;
-    _progressStep = SCREEN_WIDTH*TIMER_INTERVAL/_totalTime;
     _preLayerWidth = SCREEN_WIDTH;
     _preLayerHeight = SCREEN_HEIGHT;
     _preLayerHWRate =_preLayerHeight/_preLayerWidth;
@@ -147,7 +150,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
 ////////////////////////////////////////////////////////////////////////
 #pragma mark - UI
 ////////////////////////////////////////////////////////////////////////
-- (void) setupUI{
+- (void)setupUI {
     //    253 91 73
     _timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(20.0, 27.0, 80, 26.0)];
     _timeLabel.font = [UIFont systemFontOfSize:13.0f];
@@ -176,7 +179,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     // 返回按钮
     UIButton* backBtn = [[UIButton alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - 60, 25, 30, 30)];
     [backBtn setImage:[UIImage imageNamed:@"BackToHome"] forState:UIControlStateNormal];
-    [backBtn addTarget:self action:@selector(clickBackToHome) forControlEvents:UIControlEventTouchUpInside];
+    [backBtn addTarget:self action:@selector(clickBack:) forControlEvents:UIControlEventTouchUpInside];
     [_filteredVideoView addSubview:backBtn];
     
     // 前后摄像头切换按钮
@@ -225,10 +228,8 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     [_filteredVideoView addSubview:_inputLocalVieoBtn];
     
     // 录制的进度条
-    _progressPreView = [[UIView alloc]initWithFrame:CGRectMake(0, SCREEN_HEIGHT -4 , 0, 4)];
-    _progressPreView.backgroundColor = UIColorFromRGB(0xffc738);
-    [_progressPreView makeCornerRadius:2 borderColor:nil borderWidth:0];
-    [_filteredVideoView addSubview:_progressPreView];
+    [_filteredVideoView addSubview:self.progressPreView];
+    [self.progressPreView makeCornerRadius:2 borderColor:nil borderWidth:0];
     
 }
 
@@ -328,14 +329,11 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         __weak typeof(self) weakSelf = self;
         __weak typeof(self->_videoCamera) weakVideoCamera = self->_videoCamera;
-        [AlpVideoCameraUtils mergeVideos:self->_urlArray exportPath:outPath watermarkImg: [UIImage imageNamed:@"icon_watermark"] completion:^(NSURL * _Nonnull outLocalURL) {
+        [AlpVideoCameraUtils mergeVideos:self->_urlArray exportPath:outPath watermarkImg: nil/*[UIImage imageNamed:@"icon_watermark"]*/ completion:^(NSURL * _Nonnull outLocalURL) {
             [weakVideoCamera stopCameraCapture];
             
             AlpEditVideoViewController* vc = [[AlpEditVideoViewController alloc]init];
-            vc.width = weakSelf.width;
-            vc.hight = weakSelf.hight;
-            vc.bit = weakSelf.bit;
-            vc.frameRate = weakSelf.frameRate;
+            vc.videoOptions = weakSelf.videoOptions;
             vc.videoURL = outLocalURL;
             [[NSNotificationCenter defaultCenter] removeObserver:weakSelf];
             //            [[AppDelegate sharedAppDelegate] pushViewController:view animated:YES];
@@ -350,7 +348,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
         self->_currentTime = 0;
         self->_lastTime = 0;
         self->_dleButton.hidden = YES;
-        [self->_progressPreView setFrame:CGRectMake(0, SCREEN_HEIGHT - 4, 0, 4)];
+        [self.progressPreView cancelProgress];
         self->_btView.backgroundColor = [UIColor colorWithRed:250/256.0 green:211/256.0 blue:75/256.0 alpha:1];
         self->_photoCaptureButton.backgroundColor = [UIColor colorWithRed:250/256.0 green:211/256.0 blue:75/256.0 alpha:1];
         self->_photoCaptureButton.selected = NO;
@@ -371,8 +369,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
 
 /// 删除当前已经录制的内容
 - (void)clickDleBtn:(UIButton*)sender {
-    float progressWidth = [_lastAry.lastObject floatValue]/10*SCREEN_WIDTH;
-    [_progressPreView setFrame:CGRectMake(0, SCREEN_HEIGHT - 4, progressWidth, 4)];
+    [self.progressPreView cancelProgress];
     _currentTime = [_lastAry.lastObject floatValue];
     _timeLabel.text = [NSString stringWithFormat:@"录制 00:0%.0f",_currentTime];
     if (_urlArray.count) {
@@ -397,6 +394,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     imagePickerVc.allowPickingGif = NO;
     imagePickerVc.allowPickingVideo = YES;
     imagePickerVc.sortAscendingByModificationDate = YES;
+    __weak typeof(self) weakSelf = self;
     [imagePickerVc setDidFinishPickingVideoHandle:^(UIImage *coverImage,id asset) {
         _HUD = [MBProgressHUD showHUDAddedTo:self animated:YES];
         _HUD.label.text = @"视频导出中...";
@@ -416,21 +414,21 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
                     AVURLAsset *urlAsset = (AVURLAsset *)asset;
                     NSURL *url = urlAsset.URL;
                     NSData* videoData = [NSData dataWithContentsOfFile:[[url absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
-                    if (videoData.length>1024*1024*4.5) {
-                        _HUD.label.text = @"所选视频大于5M,请重新选择";
+                    if (videoData.length/1024/1024>AlpVideoCameraMaxVideoSize) {
+                        _HUD.label.text = @"所选视频大于8M,请重新选择";
                         [_HUD hide:YES afterDelay:1.5];
-                    }else
-                    {
-                        AlpEditingPublishingViewController* cor = [[AlpEditingPublishingViewController alloc] init];
+                    }
+                    else {
+                        AlpEditPublishViewController* cor = [[AlpEditPublishViewController alloc] init];
                         cor.videoURL = url;
                         
                         [[NSNotificationCenter defaultCenter] removeObserver:self];
                         [_videoCamera stopCameraCapture];
                         //                     [[AppDelegate appDelegate] pushViewController:cor animated:YES];
-                        if (self.delegate&&[self.delegate respondsToSelector:@selector(videoCamerView:pushViewCotroller:)]) {
-                            [self.delegate videoCamerView:self pushViewCotroller:cor];
+                        if (weakSelf.delegate&&[weakSelf.delegate respondsToSelector:@selector(videoCamerView:pushViewCotroller:)]) {
+                            [weakSelf.delegate videoCamerView:weakSelf pushViewCotroller:cor];
                         }
-                        [self removeFromSuperview];
+                        [weakSelf removeFromSuperview];
                         
                     }
                 });
@@ -443,27 +441,24 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
                 NSURL *videoURL =[myasset valueForProperty:ALAssetPropertyAssetURL];
                 NSURL *url = videoURL;
                 NSData* videoData = [NSData dataWithContentsOfFile:[[url absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
-                if (videoData.length>1024*1024*4.5) {
-                    _HUD.label.text = @"所选视频大于5M,请重新选择";
+                if (videoData.length/1024/1024>AlpVideoCameraMaxVideoSize) {
+                    _HUD.label.text = [NSString stringWithFormat:@"所选视频大于%fM,请重新选择", AlpVideoCameraMaxVideoSize];
                     [_HUD hide:YES afterDelay:1.5];
-                }else
-                {
-                    AlpEditingPublishingViewController* cor = [[AlpEditingPublishingViewController alloc] init];
+                }
+                else {
+                    AlpEditPublishViewController* cor = [[AlpEditPublishViewController alloc] init];
                     cor.videoURL = url;
                     
                     [[NSNotificationCenter defaultCenter] removeObserver:self];
                     [_videoCamera stopCameraCapture];
                     //                    [[AppDelegate appDelegate] pushViewController:cor animated:YES];
-                    if (self.delegate&&[self.delegate respondsToSelector:@selector(videoCamerView:pushViewCotroller:)]) {
-                        [self.delegate videoCamerView:self pushViewCotroller:cor];
+                    if (weakSelf.delegate&&[weakSelf.delegate respondsToSelector:@selector(videoCamerView:pushViewCotroller:)]) {
+                        [weakSelf.delegate videoCamerView:weakSelf pushViewCotroller:cor];
                     }
-                    [self removeFromSuperview];
+                    [weakSelf removeFromSuperview];
                 }
                 
             });
-            
-            
-            
         }
         
         
@@ -471,9 +466,6 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
         
     }];
     [[UIApplication sharedApplication] setStatusBarHidden:NO];
-    //    [[AppDelegate appDelegate] presentViewController:imagePickerVc animated:YES completion:^{
-    
-    //    }];
     if (self.delegate&&[self.delegate respondsToSelector:@selector(videoCamerView:presentViewCotroller:)]) {
         [self.delegate videoCamerView:self presentViewCotroller:imagePickerVc];
     }
@@ -481,7 +473,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
 }
 
 /// 退出
-- (void)clickBackToHome {
+- (void)clickBack:(UIButton *)btn {
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_videoCamera stopCameraCapture];
@@ -492,17 +484,10 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     }
     [_myTimer invalidate];
     _myTimer = nil;
-    if (self.backToHomeBlock) {
-        NSLog(@"clickBacktoHome");
-        self.backToHomeBlock();
+    if (self.delegate && [self.delegate respondsToSelector:@selector(videoCamerView:didClickBackButton:)]) {
+        [self.delegate videoCamerView:self didClickBackButton:btn];
         [self removeFromSuperview];
     }
-    
-    //    [self.navigationController popToRootViewControllerAnimated:YES];
-    
-    
-    
-    
 }
 
 /// 切换前后摄像头
@@ -607,18 +592,17 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     //    _timeLabel.text = [NSString stringWithFormat:@"录制 00:02%d",(int)_currentTime];
     if (_currentTime>=10) {
         _timeLabel.text = [NSString stringWithFormat:@"录制 00:%d",(int)_currentTime];
-    }else
-    {
+    }
+    else {
         _timeLabel.text = [NSString stringWithFormat:@"录制 00:0%.0f",_currentTime];
     }
     
-    float progressWidth = _progressPreView.frame.size.width+_progressStep;
-    [_progressPreView setFrame:CGRectMake(0, SCREEN_HEIGHT - 4, progressWidth, 4)];
+    [self.progressPreView setProgress:_currentTime/_totalTime animated:YES];
     if (_currentTime>3) {
         _cameraChangeButton.hidden = NO;
     }
     
-    //时间到了停止录制视频
+    // 时间到了停止录制视频
     if (_currentTime>=_totalTime) {
         
         _photoCaptureButton.enabled = NO;
@@ -664,6 +648,7 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     }
 }
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag {
+    
 }
 
 
@@ -717,10 +702,25 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
         
     }
 }
-- (void)notCloseCor {
-    [self clickBackToHome];
+- (void)closeVideoCameraNotification {
+    [self clickBack:nil];
 }
 
+- (OSProgressView *)progressPreView {
+    if (!_progressPreView) {
+        CGFloat defaultHeight = 6.0;
+        CGRect frame = CGRectMake(5.0,
+                                  5.0,
+                                  self.frame.size.width-10.0,
+                                  defaultHeight);
+        OSProgressView *progressView = [[OSProgressView alloc] initWithFrame:frame];
+        progressView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
+        progressView.progressTintColor = UIColorFromRGB(0xffc738);
+        progressView.trackTintColor = [[UIColor grayColor] colorWithAlphaComponent:0.2];
+        _progressPreView = progressView;
+    }
+    return _progressPreView;
+}
 - (void)dealloc {
     NSLog(@"%@释放了",self.class);
 }
