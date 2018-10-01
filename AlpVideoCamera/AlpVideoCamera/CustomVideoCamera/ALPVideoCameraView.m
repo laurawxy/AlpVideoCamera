@@ -346,7 +346,7 @@ typedef NS_ENUM(NSInteger, CameraManagerFlashMode) {
             vc.videoOptions = weakSelf.videoOptions;
             vc.videoURL = outLocalURL;
             [[NSNotificationCenter defaultCenter] removeObserver:weakSelf];
-            //            [[AppDelegate sharedAppDelegate] pushViewController:view animated:YES];
+            [MBProgressHUD xy_hideHUD];
             if (weakSelf.delegate&&[weakSelf.delegate respondsToSelector:@selector(videoCamerView:pushViewCotroller:)]) {
                 [weakSelf.delegate videoCamerView:weakSelf pushViewCotroller:vc];
             }
@@ -354,7 +354,7 @@ typedef NS_ENUM(NSInteger, CameraManagerFlashMode) {
         }];
 
         [self.urlArray removeAllObjects];
-        [self->_lastAry removeAllObjects];
+        [self.lastAry removeAllObjects];
         self->_currentTime = 0;
         self->_lastTime = 0;
         self.optionsView.recordState = AlpVideoCameraRecordStateDone;
@@ -365,7 +365,6 @@ typedef NS_ENUM(NSInteger, CameraManagerFlashMode) {
     
     //    http://blog.csdn.net/ismilesky/article/details/51920113  视频与音乐合成
     //    http://www.jianshu.com/p/0f9789a6d99a 视频与音乐合成
-    
     
     //[_movieWriter cancelRecording];
 }
@@ -466,6 +465,7 @@ typedef NS_ENUM(NSInteger, CameraManagerFlashMode) {
         
     }];
     [[UIApplication sharedApplication] setStatusBarHidden:NO];
+    [MBProgressHUD xy_hideHUD];
     if (self.delegate&&[self.delegate respondsToSelector:@selector(videoCamerView:presentViewCotroller:)]) {
         [self.delegate videoCamerView:self presentViewCotroller:imagePickerVc];
     }
@@ -498,20 +498,15 @@ typedef NS_ENUM(NSInteger, CameraManagerFlashMode) {
             if (_videoCamera.cameraPosition == AVCaptureDevicePositionBack) {
                 [_videoCamera pauseCameraCapture];
                 _position = CameraManagerDevicePositionFront;
-                //                dispatch_async(dispatch_get_global_queue(0, 0), ^{
                 [_videoCamera rotateCamera];
                 [_videoCamera resumeCameraCapture];
                 
                 sender.selected = YES;
                 [_videoCamera removeAllTargets];
-                //        filter = [[GPUImageBeautifyFilter alloc] init];
-//                _camerafilterChangeButton.selected = YES;
                 _filter = [[GPUImageBeautifyFilter alloc] init];
                 [_videoCamera addTarget:_filter];
                 [_filter addTarget:_filteredVideoView];
                 
-                
-                //                });
             }
         }
             break;
@@ -519,18 +514,14 @@ typedef NS_ENUM(NSInteger, CameraManagerFlashMode) {
             if (_videoCamera.cameraPosition == AVCaptureDevicePositionFront) {
                 [_videoCamera pauseCameraCapture];
                 _position = CameraManagerDevicePositionBack;
-                
-                //                dispatch_async(dispatch_get_global_queue(0, 0), ^{
                 [_videoCamera rotateCamera];
                 [_videoCamera resumeCameraCapture];
                 
                 sender.selected = NO;
                 [_videoCamera removeAllTargets];
-//                _camerafilterChangeButton.selected = NO;
                 _filter = [[LFGPUImageEmptyFilter alloc] init];
                 [_videoCamera addTarget:_filter];
                 [_filter addTarget:_filteredVideoView];
-                //                });
             }
         }
             break;
@@ -542,9 +533,7 @@ typedef NS_ENUM(NSInteger, CameraManagerFlashMode) {
         [_videoCamera.inputCamera setExposureMode:AVCaptureExposureModeContinuousAutoExposure];
         [_videoCamera.inputCamera unlockForConfiguration];
     }
-    
-    
-    
+ 
 }
 
 /// 打开或关闭美颜功能
