@@ -12,18 +12,17 @@
 #import <AVFoundation/AVFoundation.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "AlpEditVideoViewController.h"
-#import "MBProgressHUD.h"
-#import "UIView+Tools.h"
 #import "SDAVAssetExportSession.h"
 #import "TZImagePickerController.h"
 #import "TZImageManager.h"
-#import "AlpEditPublishViewController.h"
 #import <Photos/Photos.h>
 #import <Photos/PHImageManager.h>
 #import "GPUImage.h"
 #import "AlpVideoCameraDefine.h"
 #import "AlpVideoCameraUtils.h"
 #import "AlpEditVideoParameter.h"
+#import "XYCutVideoController.h"
+#import "MBProgressHUD+XYHUD.h"
 
 /**
  @note GPUImageVideoCamera录制视频 有时第一帧是黑屏 待解决
@@ -33,14 +32,18 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     CameraManagerDevicePositionBack,
     CameraManagerDevicePositionFront,
 };
-
+///闪光灯状态
+typedef NS_ENUM(NSInteger, CameraManagerFlashMode) {
+    
+//    CameraManagerFlashModeAuto, /**<自动*/
+    
+    CameraManagerFlashModeOff, /**<关闭*/
+    
+    CameraManagerFlashModeOn /**<打开*/
+};
 
 @interface ALPVideoCameraView ()<TZImagePickerControllerDelegate> {
-    // 摄像头
-    GPUImageVideoCamera *_videoCamera;
-    GPUImageOutput<GPUImageInput> *_filter;
-    // 录制器
-    GPUImageMovieWriter *_movieWriter;
+    
     NSString *_pathToMovie;
     CALayer *_focusLayer;
     NSDate *_fromdate;
@@ -59,7 +62,6 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     float _preLayerHeight;
     // 高，宽比
     float _preLayerHWRate;
-    MBProgressHUD *_HUD;
 }
 
 @property (nonatomic, assign) CameraManagerDevicePosition position;
@@ -69,7 +71,12 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
 @property (nonatomic, strong) NSMutableArray *lastAry;
 /// 保存录制视频的url，分段录制时保存不同的本地路径，合并时使用
 @property (nonatomic, strong) NSMutableArray<NSURL *> *urlArray;
-
+@property (nonatomic , assign) CameraManagerFlashMode flashMode;
+/// 相机
+@property (nonatomic, strong) GPUImageVideoCamera *videoCamera;
+@property (nonatomic, strong) GPUImageOutput<GPUImageInput> *filter;
+// 录制器
+@property (nonatomic, strong) GPUImageMovieWriter *movieWriter;
 @end
 
 @implementation ALPVideoCameraView
@@ -114,6 +121,12 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     
     [self setupUI];
     
+    [AlpVideoCameraUtils getLatestAssetFromAlbum:^(UIImage * _Nonnull image) {
+        if (!image) {
+            return;
+        }
+        [self.optionsView.inputLocalVieoBtn setImage:image forState:UIControlStateNormal];
+    }];
 }
 
 // 创建摄像头
@@ -143,8 +156,6 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     //    videoCamera.frameRate = 10;
     // 输出图像旋转方式
     _videoCamera.outputImageOrientation = UIInterfaceOrientationPortrait;
-    // 该句可防止允许声音通过的情况下，避免录制第一帧黑屏闪屏(====)
-    [_videoCamera addAudioInputsAndOutputs];
     _videoCamera.horizontallyMirrorFrontFacingCamera = YES;
     _videoCamera.horizontallyMirrorRearFacingCamera = NO;
     
@@ -152,7 +163,11 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     [_videoCamera addTarget:_filter];
     [_filter addTarget:self.filteredVideoView];
     [_videoCamera startCameraCapture];
-    
+    AVAuthorizationStatus audioStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeAudio];
+    if (audioStatus == AVAuthorizationStatusAuthorized) {
+        // 音频状态允许时，才添加视频的输入和输出
+        [_videoCamera addAudioInputsAndOutputs];
+    }
 }
 
 - (void)stopCameraCapture {
@@ -198,13 +213,26 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     [self.optionsView.cameraChangeButton addTarget:self action:@selector(stopRecording:) forControlEvents:UIControlEventTouchUpInside];
     [self.optionsView.dleButton addTarget:self action:@selector(clickDleBtn:) forControlEvents:UIControlEventTouchUpInside];
     [self.optionsView.inputLocalVieoBtn addTarget:self action:@selector(clickInputBtn:) forControlEvents:UIControlEventTouchUpInside];
+    [self.optionsView.shootingLightingButton addTarget:self action:@selector(changeFlashMode:) forControlEvents:UIControlEventTouchUpInside];
     [self.optionsView.permissionView updateHidden];
     __weak typeof(self) weakSelf = self;
+    // 请求相机权限的回调，只有摄像头权限允许访问时，才创建相机
     self.optionsView.permissionView.requestCameraAccessBlock = ^(BOOL granted) {
         if (granted) {        
             [weakSelf createVideoCamera];
         }
     };
+    // 请求麦克风权限的回调，只有麦克风权限允许时才添加音频的输入和输出
+    self.optionsView.permissionView.requestAudioAccessBlock = ^(BOOL granted) {
+        if (granted) {
+            // 该句可防止允许声音通过的情况下，避免录制第一帧黑屏闪屏(====)
+            [weakSelf.videoCamera addAudioInputsAndOutputs];
+        }
+    };
+    
+    // 初始化闪光灯模式为Auto
+    [self setFlashMode:CameraManagerFlashModeOff];
+    [self.optionsView.shootingLightingButton setImage:[UIImage imageNamed:@"icShootingLightingOff_31x31_"] forState:UIControlStateNormal];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -299,8 +327,8 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     [self.optionsView.timeButton setTitle:@"录制 00:00" forState:UIControlStateNormal];
     [_myTimer invalidate];
     _myTimer = nil;
-    _HUD = [MBProgressHUD showHUDAddedTo:self animated:YES];
-    _HUD.label.text = @"视频生成中...";
+    [MBProgressHUD xy_hideHUD];
+    [MBProgressHUD xy_showActivityMessage:@"视频生成中..."];
     
     
     // 添加分段录制的视频url
@@ -371,8 +399,8 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     imagePickerVc.sortAscendingByModificationDate = YES;
     __weak typeof(self) weakSelf = self;
     [imagePickerVc setDidFinishPickingVideoHandle:^(UIImage *coverImage,id asset) {
-        _HUD = [MBProgressHUD showHUDAddedTo:self animated:YES];
-        _HUD.label.text = @"视频导出中...";
+        [MBProgressHUD xy_hideHUD];
+        [MBProgressHUD xy_showActivityMessage:@"视频导出中..."];
         if ([UIDevice currentDevice].systemVersion.floatValue >= 8.0f) {
             PHAsset* myasset = asset;
             PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
@@ -390,18 +418,18 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
                     NSURL *url = urlAsset.URL;
                     NSData* videoData = [NSData dataWithContentsOfFile:[[url absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
                     if (videoData.length/1024/1024>AlpVideoCameraMaxVideoSize) {
-                        _HUD.label.text = @"所选视频大于8M,请重新选择";
-                        [_HUD hide:YES afterDelay:1.5];
+                        [MBProgressHUD xy_hideHUD];
+                        [MBProgressHUD xy_showMessage:[NSString stringWithFormat:@"所选视频大于%1.fM,请重新选择", AlpVideoCameraMaxVideoSize] delayTime:1.5];
                     }
                     else {
-                        AlpEditPublishViewController* cor = [[AlpEditPublishViewController alloc] init];
-                        cor.videoURL = url;
-                        
+                        [MBProgressHUD xy_hideHUD];
+                        XYCutVideoController *vc = [XYCutVideoController  new];
+                        vc.videoURL = url;
+                        vc.videoOptions = weakSelf.videoOptions;
                         [[NSNotificationCenter defaultCenter] removeObserver:self];
                         [_videoCamera stopCameraCapture];
-                        //                     [[AppDelegate appDelegate] pushViewController:cor animated:YES];
                         if (weakSelf.delegate&&[weakSelf.delegate respondsToSelector:@selector(videoCamerView:pushViewCotroller:)]) {
-                            [weakSelf.delegate videoCamerView:weakSelf pushViewCotroller:cor];
+                            [weakSelf.delegate videoCamerView:weakSelf pushViewCotroller:vc];
                         }
                         [weakSelf removeFromSuperview];
                         
@@ -417,27 +445,24 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
                 NSURL *url = videoURL;
                 NSData* videoData = [NSData dataWithContentsOfFile:[[url absoluteString ] stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
                 if (videoData.length/1024/1024>AlpVideoCameraMaxVideoSize) {
-                    _HUD.label.text = [NSString stringWithFormat:@"所选视频大于%fM,请重新选择", AlpVideoCameraMaxVideoSize];
-                    [_HUD hide:YES afterDelay:1.5];
+                    [MBProgressHUD xy_hideHUD];
+                    [MBProgressHUD xy_showMessage:[NSString stringWithFormat:@"所选视频大于%1.fM,请重新选择", AlpVideoCameraMaxVideoSize] delayTime:1.5];
                 }
                 else {
-                    AlpEditPublishViewController* cor = [[AlpEditPublishViewController alloc] init];
-                    cor.videoURL = url;
-                    
+                    [MBProgressHUD xy_hideHUD];
+                    XYCutVideoController *vc = [XYCutVideoController  new];
+                    vc.videoURL = url;
+                    vc.videoOptions = weakSelf.videoOptions;
                     [[NSNotificationCenter defaultCenter] removeObserver:self];
                     [_videoCamera stopCameraCapture];
-                    //                    [[AppDelegate appDelegate] pushViewController:cor animated:YES];
                     if (weakSelf.delegate&&[weakSelf.delegate respondsToSelector:@selector(videoCamerView:pushViewCotroller:)]) {
-                        [weakSelf.delegate videoCamerView:weakSelf pushViewCotroller:cor];
+                        [weakSelf.delegate videoCamerView:weakSelf pushViewCotroller:vc];
                     }
                     [weakSelf removeFromSuperview];
                 }
                 
             });
         }
-        
-        
-        NSLog(@"选择结束");
         
     }];
     [[UIApplication sharedApplication] setStatusBarHidden:NO];
@@ -544,27 +569,81 @@ typedef NS_ENUM(NSInteger, CameraManagerDevicePosition) {
     }
 }
 
+//设置闪光灯模式
+
+- (void)setFlashMode:(CameraManagerFlashMode)flashMode {
+    _flashMode = flashMode;
+    
+    switch (flashMode) {
+//        case CameraManagerFlashModeAuto: {
+//            NSError *error = nil;
+//            if ([_videoCamera.inputCamera hasTorch]) {
+//                BOOL locked = [_videoCamera.inputCamera lockForConfiguration:&error];
+//                if (locked) {
+//                    _videoCamera.inputCamera.torchMode = AVCaptureTorchModeAuto;
+//                    [_videoCamera.inputCamera unlockForConfiguration];
+//                }
+//            }
+//            [_videoCamera.inputCamera unlockForConfiguration];
+//        }
+//            break;
+        case CameraManagerFlashModeOff: {
+            AVCaptureDevice *device = _videoCamera.inputCamera;
+            if ([device hasTorch]) {
+                [device lockForConfiguration:nil];
+                [device setTorchMode:AVCaptureTorchModeOff];
+                [device unlockForConfiguration];
+            }
+        }
+            
+            break;
+        case CameraManagerFlashModeOn: {
+            
+            NSError *error = nil;
+            if ([_videoCamera.inputCamera hasTorch]) {
+                BOOL locked = [_videoCamera.inputCamera lockForConfiguration:&error];
+                if (locked) {
+                    _videoCamera.inputCamera.torchMode = AVCaptureTorchModeOn;
+                    [_videoCamera.inputCamera unlockForConfiguration];
+                }
+                
+            }
+            
+        }
+            break;
+            
+        default:
+            break;
+    }
+}
+
+/// 改变闪光灯状态
+- (void)changeFlashMode:(UIButton *)button {
+    switch (self.flashMode) {
+//        case CameraManagerFlashModeAuto:
+//            self.flashMode = CameraManagerFlashModeOn;
+//            [button setImage:[UIImage imageNamed:@"icShootingLightingOn_31x31_"] forState:UIControlStateNormal];
+//            break;
+        case CameraManagerFlashModeOff:
+//            self.flashMode = CameraManagerFlashModeAuto;
+            self.flashMode = CameraManagerFlashModeOn;
+            [button setImage:[UIImage imageNamed:@"icShootingLightingOn_31x31_"] forState:UIControlStateNormal];
+            break;
+        case CameraManagerFlashModeOn:
+            self.flashMode = CameraManagerFlashModeOff;
+            [button setImage:[UIImage imageNamed:@"icShootingLightingOff_31x31_"] forState:UIControlStateNormal];
+            break;
+            
+        default:
+            break;
+    }
+}
+
 /// 录制时timer更新UI
 - (void)updateTimer:(NSTimer *)sender{
-    //    NSDateFormatter *dateFormator = [[NSDateFormatter alloc] init];
-    //    dateFormator.dateFormat = @"HH:mm:ss";
-    //    NSDate *todate = [NSDate date];
-    //    NSCalendar *calendar = [NSCalendar currentCalendar];
-    //    NSInteger unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit |
-    //    NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit;
-    //    NSDateComponents *comps  = [calendar components:unitFlags _fromdate:_fromdate toDate:todate options:NSCalendarWrapComponents];
-    //    //NSInteger hour = [comps hour];
-    //    //NSInteger min = [comps minute];
-    //    //NSInteger sec = [comps second];
-    //    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-    //    NSDate *timer = [gregorian dateFromComponents:comps];
-    //    NSString *date = [dateFormator string_fromdate:timer];
-    
-    
+
     _currentTime += TIMER_INTERVAL;
     
-    
-    //    _timeLabel.text = [NSString stringWithFormat:@"录制 00:02%d",(int)_currentTime];
     if (_currentTime>=10) {
         [self.optionsView.timeButton setTitle:[NSString stringWithFormat:@"录制 00:%d",(int)_currentTime] forState:UIControlStateNormal];
     }

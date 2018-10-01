@@ -13,7 +13,6 @@
 #import <CoreLocation/CoreLocation.h>
 #import <MBProgressHUD/MBProgressHUD.h>
 #import "XYLocationSearchViewController.h"
-#import "RTRootNavigationController.h"
 #import "XYLocationManager.h"
 #import "XYLocationSearchTableViewModel.h"
 #import <CoreLocation/CoreLocation.h>
@@ -92,7 +91,7 @@ typedef NS_ENUM(NSInteger, AlpPublishVideoPermissionType) {
 
 @end
 
-@interface AlpEditPublishViewController () <UITableViewDelegate, UITableViewDataSource, AlpEditVideoNavigationBarDelegate, XYLocationSearchViewControllerDelegate>
+@interface AlpEditPublishViewController () <UITableViewDelegate, UITableViewDataSource, XYLocationSearchViewControllerDelegate>
 
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) AlpEditVideoNavigationBar *navigationBar;
@@ -228,6 +227,7 @@ typedef NS_ENUM(NSInteger, AlpPublishVideoPermissionType) {
     [self.view addSubview:self.navigationBar];
     self.navigationBar.titleLabel.text = @"发布";
     self.navigationBar.translatesAutoresizingMaskIntoConstraints = false;
+    [self.navigationBar.leftButton addTarget:self action:@selector(didClickBackButton) forControlEvents:UIControlEventTouchUpInside];
     if (@available(iOS 11.0, *)) {
         [NSLayoutConstraint constraintWithItem:self.navigationBar attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.view.safeAreaLayoutGuide attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0].active = YES;
     } else {
@@ -354,7 +354,7 @@ typedef NS_ENUM(NSInteger, AlpPublishVideoPermissionType) {
         XYLocationSearchViewController *vc = [XYLocationSearchViewController new];
         vc.delegate = self;
         // modal 半透明样式
-        RTRootNavigationController *nac = [[RTRootNavigationController alloc] initWithRootViewControllerNoWrapping:vc];
+        UINavigationController *nac = [[UINavigationController alloc] initWithRootViewController:vc];
         nac.modalPresentationStyle = UIModalPresentationOverCurrentContext;
         [self presentViewController:nac animated:YES completion:nil];
         vc.title = @"添加位置";
@@ -388,10 +388,10 @@ typedef NS_ENUM(NSInteger, AlpPublishVideoPermissionType) {
 
 
 ////////////////////////////////////////////////////////////////////////
-#pragma mark - AlpEditVideoNavigationBarDelegate
+#pragma mark - Actions
 ////////////////////////////////////////////////////////////////////////
 
-- (void)editVideoNavigationBar:(AlpEditVideoNavigationBar *)bar didClickBackButton:(UIButton *)backButton {
+- (void)didClickBackButton {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self.navigationController popViewControllerAnimated:YES];
 }
@@ -488,7 +488,6 @@ typedef NS_ENUM(NSInteger, AlpPublishVideoPermissionType) {
 - (AlpEditVideoNavigationBar *)navigationBar {
     if (!_navigationBar) {
         _navigationBar = [AlpEditVideoNavigationBar new];
-        _navigationBar.delegate = self;
     }
     return _navigationBar;
 }

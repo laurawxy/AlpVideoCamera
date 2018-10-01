@@ -8,21 +8,20 @@
 
 #import "AlpEditVideoViewController.h"
 #import <AVFoundation/AVFoundation.h>
-#import "UIView+Tools.h"
 #import "AlpMusicItemCollectionViewCell.h"
-#import "MBProgressHUD.h"
 #import "SDAVAssetExportSession.h"
 #import "GPUImage.h"
 #import "LFGPUImageEmptyFilter.h"
 #import "AlpEditPublishViewController.h"
-#import "RTRootNavigationController.h"
 #import "AlpVideoCameraDefine.h"
 #import "AlpVideoCameraResourceItem.h"
 #import "AlpEditVideoBar.h"
 #import "AlpEditVideoNavigationBar.h"
 #import "AlpEditVideoParameter.h"
+#import "AlpEditCoverViewController.h"
+#import "MBProgressHUD+XYHUD.h"
 
-@interface AlpEditVideoViewController () <UITextFieldDelegate, AlpEditVideoBarDelegate, AlpEditVideoNavigationBarDelegate>
+@interface AlpEditVideoViewController () <UITextFieldDelegate, AlpEditVideoBarDelegate>
 
 @property (nonatomic, strong) AVPlayer *audioPlayer;
 @property (nonatomic, strong) AlpEditVideoBar *editVideoBar;
@@ -32,9 +31,10 @@
 @property (nonatomic, strong) AlpVideoCameraResourceItem *resourceItem;
 @property (nonatomic, strong) GPUImageView *filterView;
 @property (nonatomic, assign) float saturationValue;
-@property (nonatomic, strong) UIImageView *bgImageView;
 @property (nonatomic, strong) UIImageView *stickersImgView;
 @property (nonatomic, weak) NSLayoutConstraint *editVideoBarBottomConstraint;
+@property (nonatomic, copy) NSString *showActivityMessage;
+//@property (nonatomic, assign) BOOL isPlaying;
 
 @end
 
@@ -44,8 +44,6 @@
     GPUImageOutput<GPUImageInput> *_filter;
     
     AVPlayerItem *_audioPlayerItem;
-    UIImageView* _playImg;
-    MBProgressHUD *_HUD;
     
     AVPlayer *_mainPlayer;
     AVPlayerLayer *_playerLayer;
@@ -62,13 +60,8 @@
 
     
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord withOptions:AVAudioSessionCategoryOptionMixWithOthers error:nil];
-    //    [self playMusic];
     
     self.view.backgroundColor = [UIColor blackColor];
-    self.title = @"预览";
-    
-    float videoWidth = self.view.frame.size.width;
-    
     
     _mainPlayer = [[AVPlayer alloc] init];
     _playerItem = [[AVPlayerItem alloc] initWithURL:_videoURL];
@@ -89,29 +82,7 @@
     [self.view addSubview:_filterView];
     [_filter addTarget:_filterView];
     _filterView.fillMode = kGPUImageFillModePreserveAspectRatioAndFill;
-    _bgImageView = [[UIImageView alloc] init];
-    [self.view addSubview:_bgImageView];
-    _bgImageView.translatesAutoresizingMaskIntoConstraints = false;
-    [NSLayoutConstraint constraintWithItem:_bgImageView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0.0].active = YES;
-    [NSLayoutConstraint constraintWithItem:_bgImageView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0.0].active = YES;
-    [NSLayoutConstraint constraintWithItem:_bgImageView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0].active = YES;
-    [NSLayoutConstraint constraintWithItem:_bgImageView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0].active = YES;
-    
-    UIImageView* playImgeView = [[UIImageView alloc] init];
-    playImgeView.image = [UIImage imageNamed:@"播放按钮-1"];
-    [_bgImageView addSubview:playImgeView];
-    playImgeView.translatesAutoresizingMaskIntoConstraints = false;
-    [NSLayoutConstraint constraintWithItem:playImgeView attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:_bgImageView attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0.0].active = YES;
-    [NSLayoutConstraint constraintWithItem:playImgeView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:_bgImageView attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0.0].active = YES;
-    [NSLayoutConstraint constraintWithItem:playImgeView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:SCREEN_LayoutScaleBaseOnIPHEN6(60)].active = YES;
-    [NSLayoutConstraint constraintWithItem:playImgeView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:SCREEN_LayoutScaleBaseOnIPHEN6(60)].active = YES;
-    
-    _playImg = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, 40, 40)];
-    _playImg.center = CGPointMake(videoWidth/2, videoWidth/2);
-    [_playImg setImage:[UIImage imageNamed:@"videoPlay"]];
-    [_playerLayer addSublayer:_playImg.layer];
-    _playImg.hidden = YES;
-    
+
     _stickersImgView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, 150, 150)];
     _stickersImgView.center = CGPointMake(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
     _stickersImgView.hidden = YES;
@@ -121,10 +92,17 @@
     UIPanGestureRecognizer *panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panView:)];
     [_stickersImgView addGestureRecognizer:panGestureRecognizer];
     
-    
+//    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapOnVideoPlayerView)];
+//    [self.view addGestureRecognizer:tap];
+    [self setupUI];
+}
+
+- (void)setupUI {
     AlpEditVideoNavigationBar *headerBar = [[AlpEditVideoNavigationBar alloc] init];
-    headerBar.delegate = self;
     [headerBar.rightButton setTitle:@"下一步" forState:UIControlStateNormal];
+    headerBar.titleLabel.text = @"编辑";
+    [headerBar.rightButton addTarget:self action:@selector(didClickNextButton) forControlEvents:UIControlEventTouchUpInside];
+    [headerBar.leftButton addTarget:self action:@selector(didClickBackButton) forControlEvents:UIControlEventTouchUpInside];
     headerBar.backgroundColor = [UIColor clearColor];
     [self.view addSubview:headerBar];
     headerBar.translatesAutoresizingMaskIntoConstraints = false;
@@ -133,8 +111,8 @@
     } else {
         [NSLayoutConstraint constraintWithItem:headerBar attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0].active = YES;
     }
-     [NSLayoutConstraint constraintWithItem:headerBar attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0.0].active = YES;
-     [NSLayoutConstraint constraintWithItem:headerBar attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0].active = YES;
+    [NSLayoutConstraint constraintWithItem:headerBar attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0.0].active = YES;
+    [NSLayoutConstraint constraintWithItem:headerBar attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0].active = YES;
     [NSLayoutConstraint constraintWithItem:headerBar attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:44.0].active = YES;
     
     _editVideoBar = [AlpEditVideoBar new];
@@ -147,17 +125,22 @@
     _editVideoBarBottomConstraint = editVideoBarBottomConstraint;
     [NSLayoutConstraint constraintWithItem:_editVideoBar attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0.0].active = YES;
     [NSLayoutConstraint constraintWithItem:_editVideoBar attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0].active = YES;
-
-    _HUD = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    _HUD.hidden = YES;
     
+    UIButton *editCoverButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [editCoverButton setTitle:@"编辑封面" forState:UIControlStateNormal];
+    [self.view addSubview:editCoverButton];
+    editCoverButton.translatesAutoresizingMaskIntoConstraints = NO;
+    editCoverButton.backgroundColor = [UIColor blackColor];
+    [editCoverButton addTarget:self action:@selector(editCoverClick) forControlEvents:UIControlEventTouchUpInside];
+    [NSLayoutConstraint constraintWithItem:editCoverButton attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0].active = YES;
+    [NSLayoutConstraint constraintWithItem:editCoverButton attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0.0].active = YES;
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    [_audioPlayer pause];
-    [_mainPlayer pause];
-    [_movieFile endProcessing];
+    [self pause];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -168,18 +151,20 @@
         [_movieFile startProcessing];
         [self playMusic];
     });
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        _bgImageView.hidden = YES;
-    });
-    
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playingEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onApplicationWillResignActive) name:UIApplicationWillResignActiveNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onApplicationDidBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onApplicationDidBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
 - (BOOL)prefersStatusBarHidden {
     return YES;
+}
+
+- (void)pause {
+    [_audioPlayer pause];
+    [_mainPlayer pause];
+    [_movieFile endProcessing];
 }
 
 - (void)compressVideoWithInputVideoUrl:(NSURL *) inputVideoUrl {
@@ -203,8 +188,7 @@
         AVVideoCodecKey: AVVideoCodecH264,
         AVVideoWidthKey: @720,   //Set your resolution width here
         AVVideoHeightKey: @1280,  //set your resolution height here
-        AVVideoCompressionPropertiesKey: @
-            {
+        AVVideoCompressionPropertiesKey: @{
                 //2000*1000  建议800*1000-5000*1000
                 //AVVideoAverageBitRateKey: @2500000, // Give your bitrate here for lower size give low values
             AVVideoAverageBitRateKey: @(weakSelf.videoOptions.bitRate),
@@ -212,45 +196,36 @@
             AVVideoAverageNonDroppableFrameRateKey: @(weakSelf.videoOptions.frameRate),
             },
         };
-        compressionEncoder.audioSettings = @
-        {
+        compressionEncoder.audioSettings = @{
         AVFormatIDKey: @(kAudioFormatMPEG4AAC),
         AVNumberOfChannelsKey: @2,
         AVSampleRateKey: @44100,
         AVEncoderBitRateKey: @128000,
         };
-        [compressionEncoder exportAsynchronouslyWithCompletionHandler:^
-         {
+        [compressionEncoder exportAsynchronouslyWithCompletionHandler:^{
              dispatch_async(dispatch_get_main_queue(), ^{
                  //更新UI操作
                  //.....
-                 if (compressionEncoder.status == AVAssetExportSessionStatusCompleted)
-                 {
+                 if (compressionEncoder.status == AVAssetExportSessionStatusCompleted) {
                      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                         _HUD.hidden = YES;
+                         [MBProgressHUD xy_hideHUD];
                          [[NSNotificationCenter defaultCenter] removeObserver:self];
                          AlpEditPublishViewController* cor = [[AlpEditPublishViewController alloc] init];
                          cor.videoURL = compressionEncoder.outputURL;
-                         //                         [[AppDelegate appDelegate] pushViewController:cor animated:YES];
-                         [self.rt_navigationController pushViewController:cor animated:YES complete:nil];
+                         [self.navigationController pushViewController:cor animated:YES];
                          
                      });
                      
-                 }
-                 else if (compressionEncoder.status == AVAssetExportSessionStatusCancelled)
-                 {
-                     //                     HUD.labelText = @"Compression Failed";
-                     _HUD.label.text = @"Compression Failed";
+                 } else if (compressionEncoder.status == AVAssetExportSessionStatusCancelled) {
+                     [MBProgressHUD xy_showMessage:@"Compression Failed" delayTime:1.5];
                      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                          [[NSNotificationCenter defaultCenter] removeObserver:self];
                          //                         [[NSNotificationCenter defaultCenter] postNotificationName:kTabBarHiddenNONotification object:self];
                          [self.navigationController popToRootViewControllerAnimated:YES];
                          
                      });
-                 }
-                 else
-                 {
-                     _HUD.label.text = @"ompression Failed";
+                 } else {
+                     [MBProgressHUD xy_showMessage:@"Compression Failed" delayTime:1.5];
                      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                          [[NSNotificationCenter defaultCenter] removeObserver:self];
                          //                         [[NSNotificationCenter defaultCenter] postNotificationName:kTabBarHiddenNONotification object:self];
@@ -265,8 +240,7 @@
 
 
 - (void)mixFiltWithVideoAndInputVideoURL:(NSURL*)inputURL {
-    
-    _HUD.label.text = @"滤镜合成中...";
+    self.showActivityMessage = @"滤镜合成中...";
     _isdoing = YES;
     NSURL *sampleURL = inputURL;
     _endMovieFile = [[GPUImageMovie alloc] initWithURL:sampleURL];
@@ -334,7 +308,7 @@
 - (void)mixAudioAndVidoWithInputURL1:(NSURL*)inputURL {
     
     // 路径
-    _HUD.label.text = @"贴纸合成中...";
+    self.showActivityMessage = @"贴纸合成中...";
     NSString *documents = [NSHomeDirectory() stringByAppendingPathComponent:@"tmp"];
     
     
@@ -457,7 +431,7 @@
     //    audio529
     
     // 路径
-    _HUD.label.text = @"音乐合成中...";
+    self.showActivityMessage = @"音乐合成中...";
     NSString *documents = [NSHomeDirectory() stringByAppendingPathComponent:@"tmp"];
     
     // 声音来源
@@ -724,9 +698,6 @@
     }
     NSURL *audioInputUrl = [NSURL fileURLWithPath:self.editVideoBar.audioPath];
     // 声音来源
-    
-    //    NSURL *audioInputUrl = [NSURL URLWithString:_audioPath];
-
     _audioPlayerItem =[AVPlayerItem playerItemWithURL:audioInputUrl];
     
     [_audioPlayer replaceCurrentItemWithPlayerItem:_audioPlayerItem];
@@ -734,16 +705,6 @@
     [_audioPlayer play];
 }
 
-- (void)playOrPause{
-    if (_playImg.isHidden) {
-        _playImg.hidden = NO;
-        [_mainPlayer pause];
-        
-    }else{
-        _playImg.hidden = YES;
-        [_mainPlayer play];
-    }
-}
 
 /// 重新播放
 - (void)replayVideo {
@@ -753,6 +714,12 @@
         [_audioPlayerItem seekToTime:kCMTimeZero];
         [_audioPlayer play];
     }
+}
+
+- (void)editCoverClick {
+    AlpEditCoverViewController *vc = [AlpEditCoverViewController new];
+    vc.videoURL = self.videoURL;
+    [self presentViewController:vc animated:YES completion:nil];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -766,10 +733,11 @@
 - (void)onApplicationWillResignActive {
     [_mainPlayer pause];
     [_movieFile endProcessing];
+    [_audioPlayer pause];
     if (_isdoing) {
         [_movieWriter cancelRecording];
         [_endMovieFile endProcessing];
-        _HUD.hidden = YES;
+        [MBProgressHUD xy_hideHUD];
     }
 }
 
@@ -777,7 +745,6 @@
     [_playerItem seekToTime:kCMTimeZero];
     [_mainPlayer play];
     [_movieFile startProcessing];
-    
     if (_isdoing) {
         
     }
@@ -803,10 +770,10 @@
 }
 
 ////////////////////////////////////////////////////////////////////////
-#pragma mark - AlpEditVideoNavigationBarDelegate
+#pragma mark - Actions
 ////////////////////////////////////////////////////////////////////////
-- (void)editVideoNavigationBar:(AlpEditVideoNavigationBar *)bar didClickNextButton:(UIButton *)nextButton {
-    _HUD.hidden = NO;
+- (void)didClickNextButton {
+    [MBProgressHUD xy_showActivityMessage:@"奋力处理中..."];
     if ([_filtClassName isEqualToString:@"LFGPUImageEmptyFilter"]) {
         //无滤镜效果
         if (self.editVideoBar.audioPath||!_stickersImgView.hidden) {
@@ -814,7 +781,6 @@
             [self mixAudioAndVidoWithInputURL:_videoURL];
         }
         else {
-            _HUD.label.text = @"视频处理中...";
             [self compressVideoWithInputVideoUrl:_videoURL];
             
         }
@@ -825,10 +791,22 @@
     }
 }
 
-- (void)editVideoNavigationBar:(AlpEditVideoNavigationBar *)bar didClickBackButton:(UIButton *)backButton {
+- (void)didClickBackButton {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self.navigationController popViewControllerAnimated:YES];
 }
+
+// 点按videoLayer的手势
+//- (void)tapOnVideoPlayerView {
+//
+//    if (self.isPlaying) {
+//        [_mainPlayer pause];
+//    } else {
+//        [_mainPlayer play];
+//    }
+//
+//    self.isPlaying = !self.isPlaying;
+//}
 
 ////////////////////////////////////////////////////////////////////////
 #pragma mark - AlpEditVideoBarDelegate
@@ -895,6 +873,8 @@
 
 - (void)dealloc {
     NSLog(@"释放了 %@", NSStringFromClass([self class]));
+    [self pause];
+    _movieFile = nil;
 }
 
 @end

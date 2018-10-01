@@ -7,8 +7,17 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <AVFoundation/AVFoundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
+
+@interface AlpVideoCameraCover: NSObject
+
+@property (nonatomic, strong) UIImage *firstFrameImage;
+@property (nonatomic, assign) CMTime coverTime;
+@property (nonatomic, copy) NSURL *videoURL;
+
+@end
 
 @interface AlpVideoCameraUtils : NSObject
 
@@ -30,6 +39,42 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)createVideoFolderIfNotExist;
 
+// mov视频转换成mp4格式
++ (void)convertMovTypeIntoMp4TypeWithSourceUrl:(NSURL *)sourceUrl convertSuccess:(void (^)(NSURL *path))convertSuccess;
+// 获取视频的大小和时间
++ (NSDictionary *)getLocalVideoSizeAndTimeWithSourcePath:(NSString *)path;
+
+/// 根据视频的路径取出图片存放到数组 图片的数量 = 总帧数/封面展示的帧数
+/// @param videoURL 视频的URL
+/// @param numberOfCoverFrame 每一个封面展示的帧数
++ (void)getCoversByVideoURL:(NSURL *)videoURL
+         numberOfCoverFrame:(NSInteger)numberOfCoverFrame
+                   callBack:(void (^)(CMTime  time, NSArray<AlpVideoCameraCover *> *images, NSError *error))callBack;
+
+/// 根据视频的路径取出图片存放到数组 图片的数量 = 总帧数/封面展示的帧数
+/// @param videoURL 视频的URL
+/// @param coverSeconds 每一个封面截取视频的秒数
++ (void)getCoversByVideoURL:(NSURL *)videoURL
+               coverSeconds:(NSInteger)coverSeconds
+                   callBack:(void (^)(CMTime  time, NSArray<AlpVideoCameraCover *> *images, NSError *error))callBack;
+
+/// 根据视频的路径取出图片存放到数组 图片的数量 = 总帧数/封面展示的帧数
+/// @param videoURL 视频的URL
+/// @param photoCount 获取图片的数量
++ (void)getCoversByVideoURL:(NSURL *)videoURL
+               photoCount:(NSInteger)photoCount
+                   callBack:(void (^)(CMTime  time, NSArray<AlpVideoCameraCover *> *images, NSError *error))callBack;
+
+/// 根据视频的路径取出图片存放到数组 图片的数量 = 总帧数/封面展示的帧数
+//+ (void)getImagesByCover:(AlpVideoCameraCover *)cover callBack:(void (^)(NSArray<UIImage *> *images))callBack;
+
+/// 根据timeValue帧s获取视频的封面
++ (void)getCoverByVideoURL:(NSURL *)videoURL
+                 timeValue:(CMTimeValue)value
+                  callBack:(void (^)(AlpVideoCameraCover *image))callBack;
+
+/// 获取系统相册最后一个视频缩略图
++ (void)getLatestAssetFromAlbum:(void (^)(UIImage *image))callBack;
 @end
 
 NS_ASSUME_NONNULL_END
